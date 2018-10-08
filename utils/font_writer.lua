@@ -9,6 +9,8 @@ local alignment = {
   ["right" ] = -1;
 }
 
+local function round(x) return math.floor(x + 0.5) end
+
 function font_writer.print_aligned(font, text, x, y, align_x, align_y)
   local line_count = (select(2, text:gsub('\n', '\n')) or 0) + 1
   local width  = font:getWidth(text)
@@ -18,12 +20,12 @@ function font_writer.print_aligned(font, text, x, y, align_x, align_y)
   local dy = alignment[align_y or "top" ] or 0
 
   love.graphics.setFont(font)
-  love.graphics.print(text, x + dx*width, y + dy*height)
+  love.graphics.print(text, round(x + dx*width), round(y + dy*height))
 end
 
 function font_writer.print(font, text, x, y, r, ox, oy, kx, ky)
   love.graphics.setFont(font)
-  love.graphics.print(text, x, y, r, 1, 1, ox, oy, kx, ky)
+  love.graphics.print(text, round(x), round(y), r, 1, 1, ox, oy, kx, ky)
 end
 
 return font_writer
