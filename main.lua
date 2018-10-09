@@ -16,6 +16,17 @@ function love.load(arg)
     y      = 240;
     hint   = "Sample hint";
   });
+  local calc_button = guilt.new("Button", {
+    x      = 150;
+    y      = 300;
+    text   = "Calculate";
+    on_click = function (self)
+      local status, result = pcall(loadstring("return "..textfield.text))
+      if status then
+         textfield:set_text(result)
+       end
+    end
+  });
   local card = guilt.new("Card", {
     x      = 180;
     y      = 210;
@@ -59,25 +70,26 @@ function love.load(arg)
         end;
       });
       textfield;
+      calc_button;
     }
   })
 
   gui = {
     card;
     guilt.new("Button", {
-      x = 160;
+      x = 180;
       y = 500;
-      text = "Toggle Card";
+      text = "Toggle card";
       on_click = function (self)
-        if not self.olf_card_height then
-          self.olf_card_height = card.height
-          card.height = 300
+        if self.card_width then
+          card.width = self.card_width
+          self.card_width = nil
         else
-          card.height = self.olf_card_height
-          self.olf_card_height = nil
+          self.card_width = card.width
+          card.width = 160
         end
       end
-    })
+    });
   }
 end
 

@@ -42,8 +42,8 @@ function Textfield:set_text(text)
   self.caret  = unicode.len(self.text)
 end
 
-function Textfield:_set_caret(new_caret)
-  self.select = shift_is_down() and (self.select or self.caret) or nil
+function Textfield:_set_caret(new_caret, select)
+  self.select = (select or shift_is_down()) and (self.select or self.caret) or nil
   self.caret  = clamp(new_caret, 1, unicode.len(self.text) + 1)
 end
 
@@ -77,17 +77,20 @@ function Textfield.draw : _default_ ()
   -- field
   smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
 
-  local sx, sy, sw, sh = love.graphics.getScissor()
-  love.graphics.intersectScissor(x + x_pad, y, width - 2*x_pad, height)
-  if #text == 0 then
-    love.graphics.setColor(rgba(0, 0, 0, 0.3))
-    font_writer.print_aligned(font, self.hint, text_x, cy, "left", "center")
-  else
-    -- TODO if text is to long, add elipsis near right border
-    love.graphics.setColor(rgba(0, 0, 0, 0.8))
-    font_writer.print_aligned(font, text, text_x, cy, "left", "center")
+  pleasure.push_region(x + x_pad, y, width - 2*x_pad, height)
+  do
+    local dy = height/2
+
+    if #text == 0 then
+      love.graphics.setColor(rgba(0, 0, 0, 0.3))
+      font_writer.print_aligned(font, self.hint, 0, dy, "left", "center")
+    else
+      -- TODO if text is to long, add elipsis near right border
+      love.graphics.setColor(rgba(0, 0, 0, 0.8))
+      font_writer.print_aligned(font, text, 0, dy, "left", "center")
+    end
   end
-  love.graphics.setScissor(sx, sy, sw, sh)
+  pleasure.pop_region()
 end
 
 function Textfield.draw : active ()
@@ -100,32 +103,33 @@ function Textfield.draw : active ()
   -- field
   smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
 
-  love.graphics.push()
-  local sx, sy, sw, sh = love.graphics.getScissor()
-  love.graphics.intersectScissor(x + x_pad - 1, y, width - 2*x_pad + 2, height)
+  pleasure.push_region(x + x_pad - 1, y, width - 2*x_pad + 2, height)
   do
     local text, caret = self.text, self.caret
+
+    local dy = height/2
 
     local blink = (love.timer.getTime() % 1 < 0.5)
     if not blink then -- show caret
       local left  = unicode.sub(text, 1, caret - 1)
-      local caret_x = text_x + font:getWidth(left)
-      smooth_line(caret_x, cy - 6, caret_x, cy + 6, 1, rgb(0, 0, 0))
+      local caret_x = font:getWidth(left) + 1
+      smooth_line(caret_x, dy - 6, caret_x, dy + 6, 1, rgb(0, 0, 0))
     end
 
     local select = self.select
     if select then
       local start, stop = minmax(select, caret)
-      local from_x = text_x + font:getWidth(unicode.sub(text, 1, start - 1))
+      local from_x = font:getWidth(unicode.sub(text, 1, start - 1)) + 1
       local size = font:getWidth(unicode.sub(text, start, stop - 1))
-      smooth_rectangle(from_x, cy - 8, size, 16, 0, rgb(30, 147, 213))
+      local fh = font:getHeight()
+
+      smooth_rectangle(from_x, dy - fh/2, size, fh, 0, rgb(30, 147, 213))
     end
 
     love.graphics.setColor(rgb(0, 0, 0))
-    font_writer.print_aligned(font, self.text, text_x, cy, "left", "center")
+    font_writer.print_aligned(font, self.text, 1, dy, "left", "center")
   end
-  love.graphics.setScissor(sx, sy, sw, sh)
-  love.graphics.pop()
+  pleasure.pop_region()
 end
 
 function Textfield:_paste_text(input)
@@ -203,6 +207,18 @@ function Textfield.keypressed : active (key, scancode, isrepeat)
   end
 end
 
+function Textfield:_mouse_index (mx, my)
+  local text, text_x = self.text, self:_text_x()
+  local text_len = unicode.len(text)
+  for i = 0, text_len do
+    local char_x = text_x + font:getWidth(unicode.sub(text, 1, i))
+    if char_x >= mx then
+      return i
+    end
+  end
+  return text_len + 1
+end
+
 function Textfield:mousepressed (mx, my, button_index)
   if button_index ~= 1 then return end
 
@@ -212,19 +228,12 @@ function Textfield:mousepressed (mx, my, button_index)
   end
 
   self.state = "active"
+  self:_set_caret(self:_mouse_index(mx, my))
+end
 
-  local text = self.text
-  local text_x = self:_text_x()
-
-  local text_len = unicode.len(text)
-  for i = 0, text_len do
-    local char_x = text_x + font:getWidth(unicode.sub(text, 1, i))
-    if char_x >= mx then
-      self:_set_caret(i)
-      return
-    end
-  end
-  self:_set_caret(text_len + 1)
+function Textfield.mousemoved : active (mx, my, dx, dy)
+  if not love.mouse.isDown(1) then return end
+  self:_set_caret(self:_mouse_index(mx, my), true)
 end
 
 guilt.finalize_template(Textfield)

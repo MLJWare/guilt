@@ -16,9 +16,6 @@ local Card = guilt.template("Card"):needs{
   height = pleasure.need.non_negative_number;
 }
 
-local x_pad     = 16
-local y_pad     = 16
-
 function Card:init()
   if self.children then
     pleasure.need.table(self.children)
@@ -36,39 +33,41 @@ function Card:draw ()
   -- card
   smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
   -- content
-  love.graphics.push()
-  local sx, sy, sw, sh = love.graphics.getScissor()
-  love.graphics.intersectScissor(x, y, width, height)
-  love.graphics.translate(x, y)
+  pleasure.push_region(x, y, width, height)
   for i, child in ipairs(self.children) do
     pleasure.try_invoke(child, "draw")
   end
-  love.graphics.setScissor(sx, sy, sw, sh)
-  love.graphics.pop()
+  pleasure.pop_region()
 end
 
 function Card:mousepressed (mx, my, button, isTouch)
   --if not pleasure.contains(self, mx, my) then return end
 
-  mx, my = mx - self.x + self.width/2, my - self.y + self.height/2
+  local x, y = self.x, self.y
+  mx, my = mx - x + self.width/2, my - y + self.height/2
+
   for i, child in ipairs(self.children) do
     pleasure.try_invoke(child, "mousepressed", mx, my, button, isTouch)
   end
 end
 
 function Card:mousemoved (mx, my, dx, dy)
-  if not pleasure.contains(self, mx, my) then return end
+  --if not pleasure.contains(self, mx, my) then return end
 
-  mx, my = mx - self.x + self.width/2, my - self.y + self.height/2
+  local x, y = self.x, self.y
+  mx, my = mx - x + self.width/2, my - y + self.height/2
+
   for i, child in ipairs(self.children) do
     pleasure.try_invoke(child, "mousemoved", mx, my, dx, dy)
   end
 end
 
 function Card:mousereleased (mx, my, button, isTouch)
-  if not pleasure.contains(self, mx, my) then return end
+  --if not pleasure.contains(self, mx, my) then return end
 
-  mx, my = mx - self.x + self.width/2, my - self.y + self.height/2
+  local x, y = self.x, self.y
+  mx, my = mx - x + self.width/2, my - y + self.height/2
+
   for i, child in ipairs(self.children) do
     pleasure.try_invoke(child, "mousereleased", mx, my, button, isTouch)
   end
