@@ -103,7 +103,9 @@ function Textfield.draw : active ()
   -- field
   smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
 
-  pleasure.push_region(x + x_pad - 1, y, width - 2*x_pad + 2, height)
+  local region_x = x + x_pad - 1
+  pleasure.push_region(region_x, y, width - 2*x_pad + 2, height)
+  love.graphics.translate(text_x - region_x, 0)
   do
     local text, caret = self.text, self.caret
 
