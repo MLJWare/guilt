@@ -1,9 +1,11 @@
 local path = (...)
 local is                      = require (path..".is")
+local try                     = require (path..".try")
 local need                    = require (path..".need")
 
 local pleasure = {
   is    = is;
+  try   = try;
   need  = need;
 }
 
@@ -41,18 +43,6 @@ function pleasure.pop_region()
   else
     love.graphics.setScissor()
   end
-end
-
-function pleasure.try_call(t, k, ...)
-  if not (t and k) then return end
-  local fn = t[k] if not is.callable(fn) then return end
-  return fn(...)
-end
-
-function pleasure.try_invoke(t, k, ...)
-  if not (t and k) then return end
-  local fn = t[k] if not is.callable(fn) then return end
-  return fn(t, ...)
 end
 
 return pleasure

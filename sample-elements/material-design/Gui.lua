@@ -11,9 +11,9 @@ local rgba                    = require "lib.color.rgba"
 
 local is_callable = pleasure.is.callable
 
-local Card = guilt.template("Card")
+local Gui = guilt.template("Gui")
 
-function Card:init()
+function Gui:init()
   if self.children then
     pleasure.need.table(self.children)
   else
@@ -21,15 +21,10 @@ function Card:init()
   end
 end
 
-function Card:draw ()
+function Gui:draw ()
   local cx, cy, width, height = self.x, self.y, self.width, self.height
   local x, y = cx - width/2, cy - height/2
 
-  -- drop shadow
-  smooth_rectangle(x, y+1, width, height, 2, rgba(0,0,0,0.62))
-  -- card
-  smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
-  -- content
   pleasure.push_region(x, y, width, height)
   for i, child in ipairs(self.children) do
     pleasure.try.invoke(child, "draw")
@@ -37,12 +32,12 @@ function Card:draw ()
   pleasure.pop_region()
 end
 
-Card.resize        = require "lib.guilt.delegate.resize"
-Card.mousepressed  = require "lib.guilt.delegate.mousepressed"
-Card.mousemoved    = require "lib.guilt.delegate.mousemoved"
-Card.mousereleased = require "lib.guilt.delegate.mousereleased"
-Card.textinput     = require "lib.guilt.delegate.textinput"
-Card.keypressed    = require "lib.guilt.delegate.keypressed"
-Card.keyreleased   = require "lib.guilt.delegate.keyreleased"
+Gui.resize        = require "lib.guilt.delegate.resize"
+Gui.mousepressed  = require "lib.guilt.delegate.mousepressed"
+Gui.mousemoved    = require "lib.guilt.delegate.mousemoved"
+Gui.mousereleased = require "lib.guilt.delegate.mousereleased"
+Gui.textinput     = require "lib.guilt.delegate.textinput"
+Gui.keypressed    = require "lib.guilt.delegate.keypressed"
+Gui.keyreleased   = require "lib.guilt.delegate.keyreleased"
 
-guilt.finalize_template(Card)
+guilt.finalize_template(Gui)

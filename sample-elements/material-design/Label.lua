@@ -10,8 +10,6 @@ local rgb                     = require "lib.color.rgb"
 local rgba                    = require "lib.color.rgba"
 
 local Label = guilt.template("Label"):needs{
-  x      = pleasure.need.number;
-  y      = pleasure.need.number;
   text   = pleasure.need.string;
 }
 

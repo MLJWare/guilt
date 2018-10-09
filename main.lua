@@ -2,6 +2,10 @@ local guilt                   = require "lib.guilt"
 local pleasure                = require "lib.guilt.pleasure"
 local rgb                     = require "lib.color.rgb"
 
+local try_invoke  = pleasure.try.invoke
+local contains    = pleasure.contains
+local is_callable = pleasure.is.callable
+
 for i, element in ipairs(love.filesystem.getDirectoryItems("sample-elements/material-design")) do
   if element:find("^[A-Z][^%.]*%.lua$") then
     require ("sample-elements.material-design."..element:sub(1, -5))
@@ -20,7 +24,7 @@ function love.load(arg)
     x      = 150;
     y      = 300;
     text   = "Calculate";
-    on_click = function (self)
+    mouseclicked = function (self)
       local status, result = pcall(loadstring("return "..textfield.text))
       if status then
          textfield:set_text(result)
@@ -43,7 +47,7 @@ function love.load(arg)
         x      = 100;
         y      = 140;
         text   = "Hello";
-        on_click = function (self, mx, my)
+        mouseclicked = function (self, mx, my)
           local dx, dy = (mx - self.x)/self.width, (my - self.y)/self.height
           print(("Pressed the %q button at: (%.2f, %.2f)"):format(self.text, dx, dy))
           textfield:set_text(self.text)
@@ -53,7 +57,7 @@ function love.load(arg)
         x      = 200;
         y      = 140;
         text   = "World";
-        on_click = function (self, mx, my)
+        mouseclicked = function (self, mx, my)
           local dx, dy = mx - self.x, my - self.y
           print(("Pressed the %q button"):format(self.text))
           textfield:set_text(self.text)
@@ -75,43 +79,45 @@ function love.load(arg)
   })
 
   gui = {
-    card;
-    guilt.new("Button", {
-      x = 180;
-      y = 500;
-      text = "Toggle card";
-      on_click = function (self)
-        if self.card_width then
-          card.width = self.card_width
-          self.card_width = nil
-        else
-          self.card_width = card.width
-          card.width = 160
+    children = {
+      card;
+      guilt.new("Button", {
+        x    = 180;
+        y    = 500;
+        text = "Toggle card";
+        mouseclicked = function (self)
+          if self.card_width then
+            card.width = self.card_width
+            self.card_width = nil
+          else
+            self.card_width = card.width
+            card.width = 160
+          end
         end
-      end
-    });
+      });
+    };
   }
 end
 
-for _, callback in ipairs{
-  "resize";
-  "mousepressed";
-  "mousemoved";
-  "mousereleased";
-  "textinput";
+for i, callback in ipairs{
   "keypressed";
   "keyreleased";
+  "mousemoved";
+  "mousepressed";
+  "mousereleased";
+  "resize";
+  "textinput";
 } do
   love[callback] = function (...)
-    for i, element in ipairs(gui) do
-      pleasure.try_invoke(element, callback, ...)
-    end
+    local width, height = love.graphics.getDimensions()
+    gui.x, gui.y, gui.width, gui.height = width/2, height/2, width, height
+    require ("lib.guilt.delegate."..callback)(gui, ...)
   end
 end
 
 function love.draw()
   love.graphics.clear(rgb(226, 225, 223))
-  for i, btn in ipairs(gui) do
-    pleasure.try_invoke(btn, "draw")
+  for i, element in ipairs(gui.children) do
+    try_invoke(element, "draw")
   end
 end

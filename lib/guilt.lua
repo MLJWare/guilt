@@ -1,4 +1,5 @@
 local path = (...)
+local pleasure                = require (path..".pleasure")
 local is                      = require (path..".pleasure.is")
 local invoker                 = require (path..".pleasure.invoker")
 local clone                   = require (path..".pleasure.clone")
@@ -41,6 +42,13 @@ local function _new(template, props)
   return self
 end
 
+local basic_needs = {
+  x      = pleasure.need.number;
+  y      = pleasure.need.number;
+  width  = pleasure.need.non_negative_number;
+  height = pleasure.need.non_negative_number;
+}
+
 function guilt.new(template_id, props)
   insist(is.string(template_id), "Template id must be a string.")
   local template = _templates[template_id]
@@ -53,7 +61,10 @@ function guilt.new(template_id, props)
     enforce(needs, props)
   end
 
-  return _new(template, props)
+  local instance = _new(template, props)
+  enforce(basic_needs, instance)
+
+  return instance
 end
 
 function guilt.template(template_id)

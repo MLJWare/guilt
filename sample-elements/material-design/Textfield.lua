@@ -17,8 +17,6 @@ local function ctrl_is_down () return love.keyboard.isDown("lctrl" , "rctrl" ) e
 local function shift_is_down() return love.keyboard.isDown("lshift", "rshift") end
 
 local Textfield = guilt.template("Textfield"):needs{
-  x      = pleasure.need.number;
-  y      = pleasure.need.number;
   hint   = pleasure.need.string;
 }
 
@@ -29,7 +27,6 @@ local font = roboto.body1
 
 function Textfield:init()
   self.text   = ""
-  self.state  = "normal"
   self.width  = math.max(self.width or 0, min_width)
   self.height = height
   self.caret  = 1
@@ -66,7 +63,15 @@ function Textfield:_text_x()
   return left_x + off_x
 end
 
-function Textfield.draw : _default_ ()
+function Textfield:draw()
+  if self.active then
+    self:draw_active()
+  else
+    self:draw_default()
+  end
+end
+
+function Textfield:draw_default ()
   local cx, cy, width, height = self.x, self.y-1, self.width, self.height
   local x, y = cx - width/2, cy - height/2
   local text_x = self:_text_x()
@@ -93,7 +98,7 @@ function Textfield.draw : _default_ ()
   pleasure.pop_region()
 end
 
-function Textfield.draw : active ()
+function Textfield:draw_active ()
   local cx, cy, width, height = self.x, self.y - 1, self.width, self.height
   local x, y = cx - width/2, cy - height/2
   local text_x = self:_text_x()
@@ -149,7 +154,7 @@ function Textfield:_paste_text(input)
   self.caret = start + unicode.len(input)
 end
 
-function Textfield.textinput : active (input)
+function Textfield:textinput (input)
   self:_paste_text(input)
 end
 
@@ -161,7 +166,7 @@ function Textfield:_copy_to_clipboard()
   love.system.setClipboardText(clip)
 end
 
-function Textfield.keypressed : active (key, scancode, isrepeat)
+function Textfield:keypressed (key, scancode, isrepeat)
   local select, old_caret = self.select, self.caret
 
   -- TODO ctrl-a, ctrl-c, ctrl-v, ctrl-x
@@ -222,19 +227,12 @@ function Textfield:_mouse_index (mx, my)
 end
 
 function Textfield:mousepressed (mx, my, button_index)
-  if button_index ~= 1 then return end
-
-  if not pleasure.contains(self, mx, my) then
-    self.state = "normal"
-    return
-  end
-
-  self.state = "active"
+  self.active = true
   self:_set_caret(self:_mouse_index(mx, my))
 end
 
-function Textfield.mousemoved : active (mx, my, dx, dy)
-  if not love.mouse.isDown(1) then return end
+function Textfield:mousedragged (mx, my, dx, dy, button1, button2)
+  if not button1 then return end
   self:_set_caret(self:_mouse_index(mx, my), true)
 end
 
