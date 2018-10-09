@@ -33,7 +33,8 @@ local _needs = {}
 local function _new(template, props)
   local self = props or {}
   for k, v in pairs(template) do
-    if not (is.string(k) and k:find("^__")) then
+    if not (is.string(k) and k:find("^__"))
+    and not props[k] then
       self[k] = clone(v)
     end
   end
@@ -49,7 +50,25 @@ local basic_needs = {
   height = pleasure.need.non_negative_number;
 }
 
-function guilt.new(template_id, props)
+local GUI = {}
+GUI.__index = GUI
+
+function guilt.gui(props)
+  insist(is.table(props), "GUI needs property table on creation.")
+  enforce(basic_needs, props)
+
+  props.tags = {}
+  props._guilt_gui_ = props
+
+  if props.children then
+    insist(is.table (props.children), "GUI property `children` must be a table.")
+  else
+    props.children = {}
+  end
+  return setmetatable(props, GUI)
+end
+
+function GUI:new(template_id, props)
   insist(is.string(template_id), "Template id must be a string.")
   local template = _templates[template_id]
   insist(is.table(template), "No template named %q exist.", template_id)
@@ -64,8 +83,28 @@ function guilt.new(template_id, props)
   local instance = _new(template, props)
   enforce(basic_needs, instance)
 
+  instance._guilt_gui_ = self
+
   return instance
 end
+
+function GUI:draw ()
+  local cx, cy, width, height = self.x, self.y, self.width, self.height
+  local x, y = cx - width/2, cy - height/2
+
+  pleasure.push_region(x, y, width, height)
+  for i, child in ipairs(self.children) do
+    pleasure.try.invoke(child, "draw")
+  end
+  pleasure.pop_region()
+end
+
+GUI.mousepressed  = require "lib.guilt.delegate.mousepressed"
+GUI.mousemoved    = require "lib.guilt.delegate.mousemoved"
+GUI.mousereleased = require "lib.guilt.delegate.mousereleased"
+GUI.textinput     = require "lib.guilt.delegate.textinput"
+GUI.keypressed    = require "lib.guilt.delegate.keypressed"
+GUI.keyreleased   = require "lib.guilt.delegate.keyreleased"
 
 function guilt.template(template_id)
   insist(is.string(template_id), "Template id must be a string.")

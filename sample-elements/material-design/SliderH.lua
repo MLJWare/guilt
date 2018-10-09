@@ -44,7 +44,7 @@ function SliderH:draw()
 end
 
 function SliderH:mousedragged (mx, my, dx, dy, button1, button2)
-  if button1 then return end
+  if not button1 then return end
   local old_progress = self.progress
   self:set_progress((mx - self.x)/self.length + 0.5)
   pleasure.try.invoke(self, "on_change", old_progress)

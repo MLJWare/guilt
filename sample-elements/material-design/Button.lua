@@ -1,7 +1,7 @@
 local subpath = (...):match("(.-)[^%.]+$")
 local roboto                  = require (subpath.."roboto")
 
-local smooth_rectangle              = require "utils.smooth_rectangle"
+local smooth_rectangle        = require "utils.smooth_rectangle"
 local font_writer             = require "utils.font_writer"
 
 local guilt                   = require "lib.guilt"

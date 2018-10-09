@@ -37,7 +37,6 @@ function Card:draw ()
   pleasure.pop_region()
 end
 
-Card.resize        = require "lib.guilt.delegate.resize"
 Card.mousepressed  = require "lib.guilt.delegate.mousepressed"
 Card.mousemoved    = require "lib.guilt.delegate.mousemoved"
 Card.mousereleased = require "lib.guilt.delegate.mousereleased"

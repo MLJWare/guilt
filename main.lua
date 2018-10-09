@@ -15,12 +15,21 @@ end
 local gui
 
 function love.load(arg)
-  local textfield = guilt.new("Textfield", {
+  local w, h = love.graphics.getDimensions()
+
+  gui = guilt.gui{
+    x = w/2;
+    y = h/2;
+    width  = w;
+    height = h;
+  }
+
+  local textfield = gui:new("Textfield", {
     x      = 150;
     y      = 240;
     hint   = "Sample hint";
   });
-  local calc_button = guilt.new("Button", {
+  local calc_button = gui:new("Button", {
     x      = 150;
     y      = 300;
     text   = "Calculate";
@@ -31,19 +40,20 @@ function love.load(arg)
        end
     end
   });
-  local card = guilt.new("Card", {
+  local card = gui:new("Card", {
     x      = 180;
     y      = 210;
     width  = 300;
     height = 400;
+
     children = {
-      guilt.new("Label", {
+      gui:new("Label", {
         x      = 150;
         y      = 80;
         text   = "GUI sample (based on Material Design)";
         color  = rgb(18, 38, 121);
       });
-      guilt.new("Button", {
+      gui:new("Button", {
         x      = 100;
         y      = 140;
         text   = "Hello";
@@ -53,7 +63,7 @@ function love.load(arg)
           textfield:set_text(self.text)
         end;
       });
-      guilt.new("Button", {
+      gui:new("Button", {
         x      = 200;
         y      = 140;
         text   = "World";
@@ -63,7 +73,7 @@ function love.load(arg)
           textfield:set_text(self.text)
         end;
       });
-      guilt.new("SliderH", {
+      gui:new("SliderH", {
         x        = 150;
         y        = 200;
         length   = 200;
@@ -78,24 +88,22 @@ function love.load(arg)
     }
   })
 
-  gui = {
-    children = {
-      card;
-      guilt.new("Button", {
-        x    = 180;
-        y    = 500;
-        text = "Toggle card";
-        mouseclicked = function (self)
-          if self.card_width then
-            card.width = self.card_width
-            self.card_width = nil
-          else
-            self.card_width = card.width
-            card.width = 160
-          end
+  gui.children = {
+    card;
+    gui:new("Button", {
+      x    = 180;
+      y    = 500;
+      text = "Toggle card";
+      mouseclicked = function (self)
+        if self.card_width then
+          card.width = self.card_width
+          self.card_width = nil
+        else
+          self.card_width = card.width
+          card.width = 160
         end
-      });
-    };
+      end
+    });
   }
 end
 
@@ -110,14 +118,11 @@ for i, callback in ipairs{
 } do
   love[callback] = function (...)
     local width, height = love.graphics.getDimensions()
-    gui.x, gui.y, gui.width, gui.height = width/2, height/2, width, height
-    require ("lib.guilt.delegate."..callback)(gui, ...)
+    try_invoke(gui, callback, ...)
   end
 end
 
 function love.draw()
   love.graphics.clear(rgb(226, 225, 223))
-  for i, element in ipairs(gui.children) do
-    try_invoke(element, "draw")
-  end
+  try_invoke(gui, "draw")
 end
