@@ -45,15 +45,16 @@ function Textfield:_set_caret(new_caret, select)
 end
 
 function Textfield:_text_x()
-  local left_x  = self.x - self.width/2 + x_pad
-  local right_x = left_x + self.width - 2*x_pad
+  local x, y, width, height = self:bounds()
+
+  local left_x  = x + x_pad
+  local right_x = left_x + width - 2*x_pad
   local caret_x = left_x + font:getWidth(unicode.sub(self.text, 1, self.caret - 1))
   local off_x = self.off_x
 
   if caret_x + off_x < left_x then
     off_x = left_x - caret_x
   end
-
   if caret_x + off_x >= right_x then
     off_x = right_x - caret_x
   end
@@ -72,9 +73,7 @@ function Textfield:draw()
 end
 
 function Textfield:draw_default ()
-  local cx, cy, width, height = self.x, self.y-1, self.width, self.height
-  local x, y = cx - width/2, cy - height/2
-  local text_x = self:_text_x()
+  local x, y, width, height = self:bounds()
   local text = self.text
 
   -- drop shadow
@@ -99,8 +98,8 @@ function Textfield:draw_default ()
 end
 
 function Textfield:draw_active ()
-  local cx, cy, width, height = self.x, self.y - 1, self.width, self.height
-  local x, y = cx - width/2, cy - height/2
+  local x, y, width, height = self:bounds()
+
   local text_x = self:_text_x()
 
   -- drop shadow
@@ -108,9 +107,8 @@ function Textfield:draw_active ()
   -- field
   smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
 
-  local region_x = x + x_pad - 1
-  pleasure.push_region(region_x, y, width - 2*x_pad + 2, height)
-  love.graphics.translate(text_x - region_x, 0)
+  pleasure.push_region(x + x_pad, y, width - 2*x_pad + 2, height)
+  pleasure.translate(self.off_x, 0)
   do
     local text, caret = self.text, self.caret
 
@@ -136,6 +134,12 @@ function Textfield:draw_active ()
     love.graphics.setColor(rgb(0, 0, 0))
     font_writer.print_aligned(font, self.text, 1, dy, "left", "center")
   end
+
+  love.graphics.setScissor()
+  love.graphics.setColor(0,1,0)
+  love.graphics.rectangle("line", 0, 0, width-2*x_pad, height)
+
+
   pleasure.pop_region()
 end
 

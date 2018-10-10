@@ -32,20 +32,20 @@ function Button:draw ()
 end
 
 function Button:draw_normal()
-  local cx, cy, width, height = self.x, self.y-1, self.width, self.height
-  local x, y = cx - width/2, cy - height/2
+  local x, y, width, height = self:bounds()
+  local cx, cy = x + width/2, y + height/2
 
   -- drop shadow
-  smooth_rectangle(x, y+1, width, height, 2, rgba(0,0,0,0.62))
+  smooth_rectangle(x, y, width, height, 2, rgba(0,0,0,0.62))
   -- button
-  smooth_rectangle(x, y, width, height, 2, rgb(56, 158, 255))
+  smooth_rectangle(x, y-1, width, height, 2, rgb(56, 158, 255))
   love.graphics.setColor(1, 1, 1)
   font_writer.print_aligned(roboto.button, self.text:upper(), cx, cy, "middle", "center")
 end
 
 function Button:draw_hover ()
-  local cx, cy, width, height = self.x, self.y-1, self.width, self.height
-  local x, y = cx - width/2, cy - height/2
+  local x, y, width, height = self:bounds()
+  local cx, cy = x + width/2, y + height/2
 
   -- drop shadow
   smooth_rectangle(x, y+1, width, height, 2, rgba(0,0,0,0.62))
@@ -56,8 +56,8 @@ function Button:draw_hover ()
 end
 
 function Button:draw_pressed ()
-  local cx, cy, width, height = self.x, self.y, self.width, self.height
-  local x, y = cx - width/2, cy - height/2
+  local x, y, width, height = self:bounds()
+  local cx, cy = x + width/2, y + height/2
 
   smooth_rectangle(x, y, width, height, 2, rgb(0, 116, 225))
   love.graphics.setColor(1,1,1)

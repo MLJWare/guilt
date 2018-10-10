@@ -10,32 +10,49 @@ local pleasure = {
 }
 
 function pleasure.contains(element, mx, my)
-  return math.abs(element.x - mx) <= element.width/2
-     and math.abs(element.y - my) <= element.height/2
+  local x, y, width, height = element:bounds()
+
+  return x <= mx and mx < x + width
+     and y <= my and my < y + height
 end
 
 -- TODO merge the stacks into one!
-local _stack_x = {}
-local _stack_y = {}
-local _stack_w = {}
-local _stack_h = {}
+local _stack_sx = {}
+local _stack_sy = {}
+local _stack_sw = {}
+local _stack_sh = {}
+local _stack_tx = {}
+local _stack_ty = {}
+
+local _tx, _ty = 0, 0
+
+function pleasure.translate(dx, dy)
+  love.graphics.translate(dx, dy)
+  _tx, _ty = _tx + dx, _ty + dy
+end
+
 function pleasure.push_region(x, y, w, h)
   local sx, sy, sw, sh = love.graphics.getScissor()
-  table.insert(_stack_x, sx)
-  table.insert(_stack_y, sy)
-  table.insert(_stack_w, sw)
-  table.insert(_stack_h, sh)
+  table.insert(_stack_sx, sx)
+  table.insert(_stack_sy, sy)
+  table.insert(_stack_sw, sw)
+  table.insert(_stack_sh, sh)
+  table.insert(_stack_tx, _tx)
+  table.insert(_stack_ty, _ty)
 
   love.graphics.push()
-  love.graphics.translate(x, y)
-  love.graphics.intersectScissor((sx or 0) + x, (sy or 0) + y, w, h)
+  love.graphics.intersectScissor(_tx + x, _ty + y, w, h)
+  pleasure.translate(x, y)
 end
 
 function pleasure.pop_region()
-  local sx = table.remove(_stack_x)
-  local sy = table.remove(_stack_y)
-  local sw = table.remove(_stack_w)
-  local sh = table.remove(_stack_h)
+  local sx = table.remove(_stack_sx)
+  local sy = table.remove(_stack_sy)
+  local sw = table.remove(_stack_sw)
+  local sh = table.remove(_stack_sh)
+
+  _tx = table.remove(_stack_tx) or 0
+  _ty = table.remove(_stack_ty) or 0
 
   love.graphics.pop()
   if sx and sy and sw and sh then

@@ -1,7 +1,7 @@
 local subpath = (...):match("(.-)[^%.]+$")
 local roboto                  = require (subpath.."roboto")
 
-local smooth_rectangle              = require "utils.smooth_rectangle"
+local smooth_rectangle        = require "utils.smooth_rectangle"
 local font_writer             = require "utils.font_writer"
 
 local guilt                   = require "lib.guilt"
@@ -22,8 +22,7 @@ function Card:init()
 end
 
 function Card:draw ()
-  local cx, cy, width, height = self.x, self.y, self.width, self.height
-  local x, y = cx - width/2, cy - height/2
+  local x, y, width, height = self:bounds()
 
   -- drop shadow
   smooth_rectangle(x, y+1, width, height, 2, rgba(0,0,0,0.62))

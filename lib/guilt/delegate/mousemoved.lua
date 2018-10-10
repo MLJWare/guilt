@@ -10,7 +10,9 @@ end
 
 return function (self, mx, my, dx, dy)
   --TODO mouse enter/exit
-  mx, my = mx - self.x + self.width/2, my - self.y + self.height/2
+  
+  local x, y, width, height = self:bounds()
+  mx, my = mx - x, my - y
 
   local gui = self._guilt_gui_
   local gui_pressed1_bag = gui.tags.pressed1

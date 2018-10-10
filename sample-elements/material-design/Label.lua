@@ -19,7 +19,8 @@ function Label:init()
 end
 
 function Label:draw ()
-  local cx, cy, width, height = self.x, self.y, self.width, self.height
+  local x, y, width, height = self:bounds()
+  local cx, cy = x + width/2, y + height/2
   love.graphics.setColor(self.color or  rgb(255, 255, 255))
   font_writer.print_aligned(roboto.body1, self.text, cx, cy, "middle", "center")
 end

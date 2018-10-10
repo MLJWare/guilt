@@ -11,7 +11,8 @@ end
 return function (self, mx, my, button, isTouch)
   local press_tag = "pressed"..button
 
-  mx, my = mx - self.x + self.width/2, my - self.y + self.height/2
+  local x, y, width, height = self:bounds()
+  mx, my = mx - x, my - y
 
   local gui = self._guilt_gui_
   local gui_tag_bag = ensure(gui.tags, press_tag)
