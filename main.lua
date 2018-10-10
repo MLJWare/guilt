@@ -24,6 +24,10 @@ function love.load(arg)
     y      = 0;
     width  = w;
     height = h;
+    resize = function (self, display_width, display_height)
+      self.width  = display_width;
+      self.height = display_height;
+    end;
   }
 
   local textfield = gui:new("Textfield", {
