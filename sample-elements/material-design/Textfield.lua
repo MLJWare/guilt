@@ -49,7 +49,7 @@ function Textfield:_text_x()
 
   local left_x  = x + x_pad
   local right_x = left_x + width - 2*x_pad
-  local caret_x = left_x + font:getWidth(unicode.sub(self.text, 1, self.caret - 1))
+  local caret_x = left_x + font:getWidth(unicode.sub(self:text_as_shown(), 1, self.caret - 1))
   local off_x = self.off_x
 
   if caret_x + off_x < left_x then
@@ -72,9 +72,17 @@ function Textfield:draw()
   end
 end
 
+function Textfield:text_as_shown()
+  local text = self.text
+  if self.password then
+    text = ("*"):rep(unicode.len(text))
+  end
+  return text
+end
+
 function Textfield:draw_default ()
   local x, y, width, height = self:bounds()
-  local text = self.text
+  local text = self:text_as_shown()
 
   -- drop shadow
   smooth_rectangle(x, y + 1, width, height, 2, rgba(0, 0, 0, 0.62))
@@ -110,7 +118,7 @@ function Textfield:draw_active ()
   pleasure.push_region(x + x_pad, y, width - 2*x_pad + 2, height)
   pleasure.translate(self.off_x, 0)
   do
-    local text, caret = self.text, self.caret
+    local text, caret = self:text_as_shown(), self.caret
 
     local dy = height/2
 
@@ -132,13 +140,8 @@ function Textfield:draw_active ()
     end
 
     love.graphics.setColor(rgb(0, 0, 0))
-    font_writer.print_aligned(font, self.text, 1, dy, "left", "center")
+    font_writer.print_aligned(font, text, 1, dy, "left", "center")
   end
-
-  love.graphics.setScissor()
-  love.graphics.setColor(0,1,0)
-  love.graphics.rectangle("line", 0, 0, width-2*x_pad, height)
-
 
   pleasure.pop_region()
 end
@@ -163,6 +166,7 @@ function Textfield:textinput (input)
 end
 
 function Textfield:_copy_to_clipboard()
+  if self.password then return end
   local select, old_caret = self.select, self.caret
   if not select then return end
   local from, to = minmax(select, old_caret)
@@ -219,7 +223,7 @@ function Textfield:keypressed (key, scancode, isrepeat)
 end
 
 function Textfield:_mouse_index (mx, my)
-  local text, text_x = self.text, self:_text_x()
+  local text, text_x = self:text_as_shown(), self:_text_x()
   local text_len = unicode.len(text)
   for i = 0, text_len do
     local char_x = text_x + font:getWidth(unicode.sub(text, 1, i))
