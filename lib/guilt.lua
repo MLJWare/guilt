@@ -3,6 +3,7 @@ local pleasure                = require (path..".pleasure")
 local is                      = require (path..".pleasure.is")
 local invoker                 = require (path..".pleasure.invoker")
 local clone                   = require (path..".pleasure.clone")
+local ensure                  = require (path..".pleasure.ensure")
 
 local function insist(condition, message, a)
   if condition then return end
@@ -162,8 +163,33 @@ function guilt.finalize_template(template)
   template.__index = template
 end
 
-function Template:from(parent)
-  -- TODO extend self with parent
+function Template:from(parent_id)
+  insist(is.string(parent_id), "Argument to `Template:from` must be a string referencing a previously finalized Template.")
+  local parent = _templates[parent_id]
+  insist(is.table(parent), "No template named %q exist.", parent_id)
+  insist(getmetatable(parent) ~= Template, "Template %q must be finalized before it can be used in `Template:from`.", parent_id)
+
+  for k, v in pairs(parent) do
+    if is.string(k)
+    and k ~= "__index"
+    and k ~= "bounds"
+    and k ~= "add_child"
+    and k ~= "add_children" then
+      self[k] = clone(v)
+    end
+  end
+
+  local parent_needs = _needs[parent_id]
+  if parent_needs then
+    local id    = _templates[self]
+    local needs = ensure(_needs, id)
+    for k, v in pairs(parent_needs) do
+      if not needs[k] then
+        needs[k] = v
+      end
+    end
+  end
+
   return self
 end
 
@@ -176,7 +202,17 @@ function Template:needs(props)
   end
 
   local name = _templates[self]
-  _needs[name] = props
+
+  local needs = _needs[name]
+  if not needs then
+    _needs[name] = props
+  else
+    for k, v in pairs(props) do
+      if not needs[k] then
+        needs[k] = v
+      end
+    end
+  end
 
   return self
 end

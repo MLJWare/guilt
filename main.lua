@@ -12,6 +12,12 @@ for i, element in ipairs(love.filesystem.getDirectoryItems("sample-elements/mate
   end
 end
 
+for i, element in ipairs(love.filesystem.getDirectoryItems("samples")) do
+  if element:find("^[A-Z][^%.]*%.lua$") then
+    require ("samples."..element:sub(1, -5))
+  end
+end
+
 local gui
 
 function love.load(arg)
@@ -35,9 +41,12 @@ function love.load(arg)
     align_x  = 0.5;
     anchor_y = 0.7;
     align_y  = 0.5;
+    password = false;
     hint   = "Sample hint";
   });
-  local calc_button = gui:new("Button", {
+  local calc_button = gui:new("StyleButton", {
+    color_normal  = rgb(26, 129, 27);
+    color_pressed = rgb(19, 69, 19);
     anchor_x = 0.5;
     align_x  = 0.5;
     anchor_y = 0.9;
@@ -73,11 +82,11 @@ function love.load(arg)
       align_x = 1;
       anchor_y = 0.3;
       align_y = 0.5;
-      text   = "Hello";
+      text   = "Password";
       mouseclicked = function (self, mx, my)
         local dx, dy = (mx - self.x)/self.width, (my - self.y)/self.height
         print(("Pressed the %q button at: (%.2f, %.2f)"):format(self.text, dx, dy))
-        textfield:set_text(self.text)
+        textfield.password = true
       end;
     }),
     gui:new("Button", {
@@ -85,11 +94,11 @@ function love.load(arg)
       align_x = 0;
       anchor_y = 0.3;
       align_y = 0.5;
-      text   = "World";
+      text   = "Text";
       mouseclicked = function (self, mx, my)
         local dx, dy = mx - self.x, my - self.y
         print(("Pressed the %q button"):format(self.text))
-        textfield:set_text(self.text)
+        textfield.password = false
       end;
     }),
     gui:new("SliderH", {
