@@ -8,6 +8,7 @@ local guilt                   = require "lib.guilt"
 local pleasure                = require "lib.guilt.pleasure"
 local rgb                     = require "lib.color.rgb"
 local rgba                    = require "lib.color.rgba"
+local delegate_draw           = require "lib.guilt.delegate.draw"
 
 local is_callable = pleasure.is.callable
 
@@ -21,6 +22,7 @@ function Card:init()
   end
 end
 
+
 function Card:draw ()
   local x, y, width, height = self:bounds()
 
@@ -29,11 +31,7 @@ function Card:draw ()
   -- card
   smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
   -- content
-  pleasure.push_region(x, y, width, height)
-  for i, child in self:children() do
-    pleasure.try.invoke(child, "draw")
-  end
-  pleasure.pop_region()
+  delegate_draw(self)
 end
 
 Card.mousepressed  = require "lib.guilt.delegate.mousepressed"

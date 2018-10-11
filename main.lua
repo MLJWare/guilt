@@ -14,6 +14,12 @@ for i, element in ipairs(love.filesystem.getDirectoryItems("sample-elements/mate
   end
 end
 
+for i, element in ipairs(love.filesystem.getDirectoryItems("sample-elements/layout")) do
+  if element:find("^[A-Z][^%.]*%.lua$") then
+    require ("sample-elements.layout."..element:sub(1, -5))
+  end
+end
+
 for i, element in ipairs(love.filesystem.getDirectoryItems("samples")) do
   if element:find("^[A-Z][^%.]*%.lua$") then
     require ("samples."..element:sub(1, -5))
@@ -71,6 +77,43 @@ function love.load(arg)
     preferred_height = 400;
   })
 
+  local scale_buttons = gui:new("GridLayout", {
+    column_count = 2;
+    row_count    = 1;
+    preferred_width  = 250;
+    preferred_height = 60;
+    anchor_x = 0.5;
+    align_x = 0.5;
+    anchor_y = 0.4;
+    align_y = 0.5;
+  })
+
+  scale_buttons:add_child(gui:new("Button", {
+    text     = "Scale +++++++++++++++++++++++++++++++";
+    anchor_x = 0.5;
+    align_x  = 0.5;
+    anchor_y = 0.5;
+    align_y  = 0.5;
+    mouseclicked = function (self, mx, my)
+      gui.render_scale = gui.render_scale*2
+      gui.preferred_width  = gui.preferred_width/2
+      gui.preferred_height = gui.preferred_height/2
+    end;
+  }), 1, 1)
+
+  scale_buttons:add_child(gui:new("Button", {
+    text     = "Scale -";
+    anchor_x = 0.5;
+    align_x  = 0.5;
+    anchor_y = 0.5;
+    align_y  = 0.5;
+    mouseclicked = function (self, mx, my)
+      gui.render_scale = gui.render_scale/2
+      gui.preferred_width  = gui.preferred_width*2
+      gui.preferred_height = gui.preferred_height*2
+    end;
+  }), 2, 1)
+
   card:add_children(
     gui:new("Label", {
       anchor_x = 0.5;
@@ -81,7 +124,8 @@ function love.load(arg)
       color  = rgb(18, 38, 121);
     }),
     gui:new("Button", {
-      anchor_x = 0.4;
+      x = -10;
+      anchor_x = 0.5;
       align_x = 1;
       anchor_y = 0.25;
       align_y = 0.5;
@@ -94,7 +138,8 @@ function love.load(arg)
       end;
     }),
     gui:new("Button", {
-      anchor_x = 0.6;
+      x = 10;
+      anchor_x = 0.5;
       align_x = 0;
       anchor_y = 0.25;
       align_y = 0.5;
@@ -105,30 +150,7 @@ function love.load(arg)
         textfield.password = false
       end;
     }),
-    gui:new("Button", {
-      anchor_x = 0.4;
-      align_x = 1;
-      anchor_y = 0.35;
-      align_y = 0.5;
-      text   = "Scale +";
-      mouseclicked = function (self, mx, my)
-        gui.render_scale = gui.render_scale*2
-        gui.preferred_width  = gui.preferred_width/2
-        gui.preferred_height = gui.preferred_height/2
-      end;
-    }),
-    gui:new("Button", {
-      anchor_x = 0.6;
-      align_x = 0;
-      anchor_y = 0.35;
-      align_y = 0.5;
-      text   = "Scale -";
-      mouseclicked = function (self, mx, my)
-        gui.render_scale = gui.render_scale/2
-        gui.preferred_width  = gui.preferred_width*2
-        gui.preferred_height = gui.preferred_height*2
-      end;
-    }),
+    scale_buttons,
     gui:new("SliderH", {
       anchor_x = 0.5;
       align_x  = 0.5;

@@ -22,11 +22,15 @@ return function (self, mx, my, dx, dy)
   local gui_pressed2_bag = gui.tags.pressed2
 
   local not_found = true
-  for i, child in self:children() do
+  for _, child, region_x, region_y, region_width, region_height in self:children() do
+    local mx, my = mx - (region_x or 0), my - (region_y or 0)
+    -- TODO ensure [mx, my] contained in region
     if  not_found
+    and mx >= 0 and (region_width or math.huge) > mx
+    and my >= 0 and (region_width or math.huge) > my
     and contains(child, mx, my)
     and is_callable(child.mousemoved) then
-      child:mousemoved(mx, my, button, isTouch)
+      child:mousemoved(mx, my, dx, dy)
       not_found = false
     end
 

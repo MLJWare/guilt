@@ -56,8 +56,12 @@ function pleasure.push_region(x, y, w, h)
   table.insert(_stack_scale_y, _scale_y)
 
   love.graphics.push()
-  love.graphics.intersectScissor(_tx + x*_scale_x, _ty + y*_scale_y, math.max(0, w*_scale_x), math.max(0, h*_scale_y))
-  pleasure.translate(x, y)
+  if x and y then
+    if  w and h then
+      love.graphics.intersectScissor(_tx + x*_scale_x, _ty + y*_scale_y, math.max(0, w*_scale_x), math.max(0, h*_scale_y))
+    end
+    pleasure.translate(x, y)
+  end
 end
 
 function pleasure.pop_region()

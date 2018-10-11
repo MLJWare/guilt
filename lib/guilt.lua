@@ -38,16 +38,22 @@ end
 
 local function element_bounds(self)
   local parent = self._parent
-  local parent_width, parent_height = parent:size()
+  local region_x, region_y, region_width, region_height = parent:region_of(self)
   local x, y, width, height = self.x, self.y, self:size()
-  return x + (self.anchor_x or 0)*parent_width  - (self.align_x or 0)*width
-       , y + (self.anchor_y or 0)*parent_height - (self.align_y or 0)*height
+
+  return x + (self.anchor_x or 0)*region_width  - (self.align_x or 0)*width
+       , y + (self.anchor_y or 0)*region_height - (self.align_y or 0)*height
        , width
        , height
 end
 
 local function element_children(self)
-  return ipairs(self._children)
+  return next, self._children, 0
+end
+
+local function element_region_of(self, child)
+  local _, _, width, height = self:bounds()
+  return 0, 0, width, height
 end
 
 local Template = {}
@@ -128,7 +134,9 @@ function GUI:new(template_id, props)
 end
 
 function GUI:draw ()
-  pleasure.push_region(self:bounds())
+  local scale = self.render_scale
+  local x, y, width, height = self:bounds()
+  pleasure.push_region(x, y, width*scale, height*scale)
   pleasure.scale(self.render_scale)
   for i, child in self:children() do
     pleasure.try.invoke(child, "draw")
@@ -137,9 +145,7 @@ function GUI:draw ()
 end
 
 function GUI:bounds()
-  local width, height = self:size()
-  local scale = self.render_scale
-  return self.x, self.y, width*scale, height*scale
+  return self.x, self.y, self:size()
 end
 function GUI:size()
   return self.preferred_width, self.preferred_height
@@ -147,6 +153,7 @@ end
 
 GUI.add_child     = add_child
 GUI.add_children  = add_children
+GUI.region_of     = element_region_of
 GUI.children      = element_children
 GUI.mousepressed  = require "lib.guilt.delegate.mousepressed"
 GUI.mousemoved    = require "lib.guilt.delegate.mousemoved"
@@ -196,6 +203,12 @@ function guilt.finalize_template(template)
     insist(is.callable(template.children), "Property `children` must be a method.")
   else
     template.children = element_children
+  end
+
+  if template.region_of then
+    insist(is.callable(template.region_of), "Property `region_of` must be a method.")
+  else
+    template.region_of = element_region_of
   end
 
   template.bounds       = element_bounds
