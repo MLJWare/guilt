@@ -18,8 +18,8 @@ local height    = 36
 local x_pad     = 16
 
 function Button:init()
-  self.width  = math.max(min_width, roboto.button:getWidth(self.text) + 2*x_pad)
-  self.height = height
+  self.preferred_width  = math.max(min_width, roboto.button:getWidth(self.text) + 2*x_pad)
+  self.preferred_height = height
 end
 
 

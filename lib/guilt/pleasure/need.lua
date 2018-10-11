@@ -28,6 +28,26 @@ function need.negative_number(value, id)
   ensure(is.negative_number(value), "a negative number", id)
 end
 
+function need.integer(value, id)
+  ensure(is.integer(value), "a integer", id)
+end
+
+function need.positive_integer(value, id)
+  ensure(is.positive_integer(value), "a positive integer", id)
+end
+
+function need.non_negative_integer(value, id)
+  ensure(is.non_negative_integer(value), "a non-negative integer", id)
+end
+
+function need.non_positive_integer(value, id)
+  ensure(is.non_positive_integer(value), "a non-positive integer", id)
+end
+
+function need.negative_integer(value, id)
+  ensure(is.negative_integer(value), "a negative number", id)
+end
+
 function need.string(value, id)
   ensure(is.string(value), "a string", id)
 end

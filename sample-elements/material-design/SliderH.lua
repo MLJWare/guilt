@@ -21,7 +21,7 @@ SliderH.align_y = 0.5
 
 function SliderH:init()
   self:set_progress(self.progress)
-  self.height = knob_radius*2
+  self.preferred_height = knob_radius*2
 end
 
 function SliderH:set_progress(progress)
@@ -57,7 +57,7 @@ function SliderH:mousepressed (mx, my, button_index)
   if button_index ~= 1 then return end
 
   local x1, y, width, height = self:bounds()
-  local old_progress = self.width, self.progress
+  local old_progress = self.progress
 
   local x2, knob_x = x1 + width, x1 + width*old_progress
 

@@ -31,11 +31,11 @@ function love.load(arg)
     render_scale = 1;
     x      = 0;
     y      = 0;
-    width  = w;
-    height = h;
+    preferred_width  = w;
+    preferred_height = h;
     resize = function (self, display_width, display_height)
-      self.width  = display_width/self.render_scale;
-      self.height = display_height/self.render_scale;
+      self.preferred_width  = display_width/self.render_scale;
+      self.preferred_height = display_height/self.render_scale;
     end;
   }
 
@@ -67,8 +67,8 @@ function love.load(arg)
     align_x = 0.5;
     anchor_y = 0.4;
     align_y = 0.5;
-    width  = 300;
-    height = 400;
+    preferred_width  = 300;
+    preferred_height = 400;
   })
 
   card:add_children(
@@ -87,7 +87,8 @@ function love.load(arg)
       align_y = 0.5;
       text   = "Password";
       mouseclicked = function (self, mx, my)
-        local dx, dy = (mx - self.x)/self.width, (my - self.y)/self.height
+        local width, height = self:size()
+        local dx, dy = (mx - self.x)/width, (my - self.y)/height
         print(("Pressed the %q button at: (%.2f, %.2f)"):format(self.text, dx, dy))
         textfield.password = true
       end;
@@ -112,8 +113,8 @@ function love.load(arg)
       text   = "Scale +";
       mouseclicked = function (self, mx, my)
         gui.render_scale = gui.render_scale*2
-        gui.width  = gui.width/2
-        gui.height = gui.height/2
+        gui.preferred_width  = gui.preferred_width/2
+        gui.preferred_height = gui.preferred_height/2
       end;
     }),
     gui:new("Button", {
@@ -124,8 +125,8 @@ function love.load(arg)
       text   = "Scale -";
       mouseclicked = function (self, mx, my)
         gui.render_scale = gui.render_scale/2
-        gui.width  = gui.width*2
-        gui.height = gui.height*2
+        gui.preferred_width  = gui.preferred_width*2
+        gui.preferred_height = gui.preferred_height*2
       end;
     }),
     gui:new("SliderH", {
@@ -133,7 +134,7 @@ function love.load(arg)
       align_x  = 0.5;
       anchor_y = 0.5;
       align_y  = 0.5;
-      width    = 200;
+      preferred_width = 200;
       progress = 0.5;
       on_change = function (self, old_progress)
         print(("Changed the slider from %.2f to %.2f."):format(old_progress, self.progress))
@@ -153,11 +154,11 @@ function love.load(arg)
       text = "Toggle card";
       mouseclicked = function (self)
         if self.card_height then
-          card.height = self.card_height
+          card.preferred_height = self.card_height
           self.card_height = nil
         else
-          self.card_height = card.height
-          card.height = 300
+          self.card_height = card.preferred_height
+          card.preferred_height = 300
         end
       end
     }))

@@ -30,12 +30,18 @@ local function add_children(self, ...)
   end
 end
 
+local function element_size(self)
+  --TODO change this
+  return self.preferred_width
+       , self.preferred_height
+end
+
 local function element_bounds(self)
   local parent = self._parent
-  local parent_width, parent_height = parent.width, parent.height
-  local x, y, width, height = self.x, self.y, self.width, self.height
-  return x + (self.anchor_x or 0)*parent.width  - (self.align_x or 0)*width
-       , y + (self.anchor_y or 0)*parent.height - (self.align_y or 0)*height
+  local parent_width, parent_height = parent:size()
+  local x, y, width, height = self.x, self.y, self:size()
+  return x + (self.anchor_x or 0)*parent_width  - (self.align_x or 0)*width
+       , y + (self.anchor_y or 0)*parent_height - (self.align_y or 0)*height
        , width
        , height
 end
@@ -68,10 +74,10 @@ local function _new(template, props)
 end
 
 local basic_needs = {
-  x      = pleasure.need.number;
-  y      = pleasure.need.number;
-  width  = pleasure.need.non_negative_number;
-  height = pleasure.need.non_negative_number;
+  x                = pleasure.need.number;
+  y                = pleasure.need.number;
+  preferred_width  = pleasure.need.non_negative_number;
+  preferred_height = pleasure.need.non_negative_number;
 }
 
 local GUI = {}
@@ -127,8 +133,14 @@ function GUI:draw ()
 end
 
 function GUI:bounds()
-  return self.x, self.y, self.width*self.render_scale, self.height*self.render_scale
+  local width, height = self:size()
+  local scale = self.render_scale
+  return self.x, self.y, width*scale, height*scale
 end
+function GUI:size()
+  return self.preferred_width, self.preferred_height
+end
+
 GUI.add_child     = add_child
 GUI.add_children  = add_children
 GUI.mousepressed  = require "lib.guilt.delegate.mousepressed"
@@ -166,6 +178,7 @@ function guilt.finalize_template(template)
   template.add_child = add_child
   template.add_children = add_children
   template.bounds    = element_bounds
+  template.size      = element_size
   template.__index = template
 end
 

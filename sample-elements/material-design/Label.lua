@@ -14,8 +14,8 @@ local Label = guilt.template("Label"):needs{
 }
 
 function Label:init()
-  self.width  = roboto.body1:getWidth(self.text)
-  self.height = roboto.body1:getHeight()
+  self.preferred_width  = roboto.body1:getWidth(self.text)
+  self.preferred_height = roboto.body1:getHeight()
 end
 
 function Label:draw ()

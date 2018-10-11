@@ -26,6 +26,26 @@ function is.negative_number(value)
   return type(value) == "number" and value < 0
 end
 
+function is.integer(value)
+  return type(value) == "number" and value%1==0
+end
+
+function is.positive_integer(value)
+  return type(value) == "number" and value > 0 and value%1==0
+end
+
+function is.non_negative_integer(value)
+  return type(value) == "number" and value >= 0 and value%1==0
+end
+
+function is.non_positive_integer(value)
+  return type(value) == "number" and value <= 0 and value%1==0
+end
+
+function is.negative_integer(value)
+  return type(value) == "number" and value < 0 and value%1==0
+end
+
 function is.string(value)
   return type(value) == "string"
 end

@@ -27,8 +27,8 @@ local font = roboto.body1
 
 function Textfield:init()
   self.text   = ""
-  self.width  = math.max(self.width or 0, min_width)
-  self.height = height
+  self.preferred_width  = math.max(self.preferred_width or 0, min_width)
+  self.preferred_height = height
   self.caret  = 1
   self.off_x  = 0
 end
