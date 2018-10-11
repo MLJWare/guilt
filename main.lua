@@ -1,3 +1,5 @@
+love.graphics.setDefaultFilter("nearest", "nearest")
+
 local guilt                   = require "lib.guilt"
 local pleasure                = require "lib.guilt.pleasure"
 local rgb                     = require "lib.color.rgb"
@@ -26,13 +28,14 @@ function love.load(arg)
   love.keyboard.setKeyRepeat(true)
 
   gui = guilt.gui{
+    render_scale = 1;
     x      = 0;
     y      = 0;
     width  = w;
     height = h;
     resize = function (self, display_width, display_height)
-      self.width  = display_width;
-      self.height = display_height;
+      self.width  = display_width/self.render_scale;
+      self.height = display_height/self.render_scale;
     end;
   }
 
@@ -80,7 +83,7 @@ function love.load(arg)
     gui:new("Button", {
       anchor_x = 0.4;
       align_x = 1;
-      anchor_y = 0.3;
+      anchor_y = 0.25;
       align_y = 0.5;
       text   = "Password";
       mouseclicked = function (self, mx, my)
@@ -92,13 +95,37 @@ function love.load(arg)
     gui:new("Button", {
       anchor_x = 0.6;
       align_x = 0;
-      anchor_y = 0.3;
+      anchor_y = 0.25;
       align_y = 0.5;
       text   = "Text";
       mouseclicked = function (self, mx, my)
         local dx, dy = mx - self.x, my - self.y
         print(("Pressed the %q button"):format(self.text))
         textfield.password = false
+      end;
+    }),
+    gui:new("Button", {
+      anchor_x = 0.4;
+      align_x = 1;
+      anchor_y = 0.35;
+      align_y = 0.5;
+      text   = "Scale +";
+      mouseclicked = function (self, mx, my)
+        gui.render_scale = gui.render_scale*2
+        gui.width  = gui.width/2
+        gui.height = gui.height/2
+      end;
+    }),
+    gui:new("Button", {
+      anchor_x = 0.6;
+      align_x = 0;
+      anchor_y = 0.35;
+      align_y = 0.5;
+      text   = "Scale -";
+      mouseclicked = function (self, mx, my)
+        gui.render_scale = gui.render_scale/2
+        gui.width  = gui.width*2
+        gui.height = gui.height*2
       end;
     }),
     gui:new("SliderH", {

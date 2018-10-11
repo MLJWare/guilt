@@ -16,6 +16,9 @@ return function (self, mx, my, button, isTouch)
   local x, y, width, height = self:bounds()
   mx, my = mx - x, my - y
 
+  local scale = self.render_scale or 1
+  mx, my = mx/scale, my/scale
+
   local gui = self._guilt_gui_
   local gui_tag_bag = ensure(gui.tags, press_tag)
 

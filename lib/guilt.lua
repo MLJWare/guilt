@@ -83,6 +83,11 @@ function guilt.gui(props)
 
   props.tags = {}
   props._guilt_gui_ = props
+  if props.render_scale then
+    insist(is.positive_number(props.render_scale), "GUI property `render_scale` must be a positive number.")
+  else
+    props.render_scale = 1
+  end
 
   if props.children then
     insist(is.table (props.children), "GUI property `children` must be a table.")
@@ -114,6 +119,7 @@ end
 
 function GUI:draw ()
   pleasure.push_region(self:bounds())
+  pleasure.scale(self.render_scale)
   for i, child in ipairs(self.children) do
     pleasure.try.invoke(child, "draw")
   end
@@ -121,7 +127,7 @@ function GUI:draw ()
 end
 
 function GUI:bounds()
-  return self.x, self.y, self.width, self.height
+  return self.x, self.y, self.width*self.render_scale, self.height*self.render_scale
 end
 GUI.add_child     = add_child
 GUI.add_children  = add_children
