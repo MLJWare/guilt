@@ -1390,6 +1390,14 @@ function unicode.lower(text)
   return table.concat(result)
 end
 
+function unicode.is_letters(text)
+  local upper, lower = UPPER_TO_LOWER, LOWER_TO_UPPER
+  for _, cc in utf8.codes(text) do
+    if not (upper[cc] or lower[cc]) then return false end
+  end
+  return true
+end
+
 function unicode.install()
   for name, fn in pairs(unicode) do
     if name ~= "install" then

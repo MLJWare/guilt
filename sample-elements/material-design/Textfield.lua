@@ -179,7 +179,9 @@ function Textfield:keypressed (key, scancode, isrepeat)
 
   -- TODO ctrl-a, ctrl-c, ctrl-v, ctrl-x
 
-  if ctrl_is_down() then
+  local ctrl_is_down = ctrl_is_down()
+
+  if ctrl_is_down then
     if key == "a" then
       self:_set_caret(1)
       self.select = unicode.len(self.text) + 1
@@ -212,9 +214,18 @@ function Textfield:keypressed (key, scancode, isrepeat)
   end
 
   if key == "left" then
-    self:_set_caret(self.caret - 1)
+    repeat
+      self:_set_caret(self.caret - 1)
+    until not ctrl_is_down
+    or self.caret <= 1
+    or not unicode.is_letters(unicode.sub(self.text, self.caret - 1, self.caret - 1))
   elseif key == "right" then
-    self:_set_caret(self.caret + 1)
+    local text_len = unicode.len(self.text)
+    repeat
+      self:_set_caret(self.caret + 1)
+    until not ctrl_is_down
+    or self.caret > text_len
+    or not unicode.is_letters(unicode.sub(self.text, self.caret, self.caret))
   elseif key == "home" then
     self:_set_caret(1)
   elseif key == "end" then
