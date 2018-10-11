@@ -27,6 +27,7 @@ local font = roboto.body1
 
 function Textfield:init()
   self.text   = ""
+  self.type   = "text"
   self.width  = math.max(self.width or 0, min_width)
   self.height = height
   self.caret  = 1
@@ -74,7 +75,7 @@ end
 
 function Textfield:text_as_shown()
   local text = self.text
-  if self.password then
+  if string.lower(self.type) == "password" then
     text = ("*"):rep(unicode.len(text))
   end
   return text
@@ -166,7 +167,7 @@ function Textfield:textinput (input)
 end
 
 function Textfield:_copy_to_clipboard()
-  if self.password then return end
+  if string.lower(self.type) == "password" then return end
   local select, old_caret = self.select, self.caret
   if not select then return end
   local from, to = minmax(select, old_caret)
