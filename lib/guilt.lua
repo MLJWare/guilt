@@ -18,14 +18,14 @@ local function enforce(needs, props)
 end
 
 local function add_child(self, child)
-  table.insert(self.children, child)
+  table.insert(self._children, child)
   child._parent = self
 end
 
 local function add_children(self, ...)
   for i = 1, select("#", ...) do
     local child = select(i, ...)
-    table.insert(self.children, child)
+    table.insert(self._children, child)
     child._parent = self
   end
 end
@@ -44,6 +44,10 @@ local function element_bounds(self)
        , y + (self.anchor_y or 0)*parent_height - (self.align_y or 0)*height
        , width
        , height
+end
+
+local function element_children(self)
+  return ipairs(self._children)
 end
 
 local Template = {}
@@ -95,10 +99,10 @@ function guilt.gui(props)
     props.render_scale = 1
   end
 
-  if props.children then
-    insist(is.table (props.children), "GUI property `children` must be a table.")
+  if props._children then
+    insist(is.table (props._children), "GUI property `children` must be a table.")
   else
-    props.children = {}
+    props._children = {}
   end
   return setmetatable(props, GUI)
 end
@@ -126,7 +130,7 @@ end
 function GUI:draw ()
   pleasure.push_region(self:bounds())
   pleasure.scale(self.render_scale)
-  for i, child in ipairs(self.children) do
+  for i, child in self:children() do
     pleasure.try.invoke(child, "draw")
   end
   pleasure.pop_region()
@@ -143,6 +147,7 @@ end
 
 GUI.add_child     = add_child
 GUI.add_children  = add_children
+GUI.children      = element_children
 GUI.mousepressed  = require "lib.guilt.delegate.mousepressed"
 GUI.mousemoved    = require "lib.guilt.delegate.mousemoved"
 GUI.mousereleased = require "lib.guilt.delegate.mousereleased"
@@ -165,8 +170,8 @@ end
 function guilt.finalize_template(template)
   insist(is.table(template) and getmetatable(template) == Template, "Template provided must be an actual guilt Template.")
   setmetatable(template, nil)
-  insist(template.bounds    == nil, "Template must not override internal `bounds` function.")
-  insist(template.add_child == nil, "Template must not override internal `add_child` function.")
+  insist(template.bounds == nil, "Template must not override internal `bounds` method.")
+  insist(template.size   == nil, "Template must not override internal `size` method.")
 
   template.anchor_x = template.anchor_x or 0
   template.anchor_y = template.anchor_y or 0
@@ -175,11 +180,27 @@ function guilt.finalize_template(template)
   template.x        = template.x        or 0
   template.y        = template.y        or 0
 
-  template.add_child = add_child
-  template.add_children = add_children
-  template.bounds    = element_bounds
-  template.size      = element_size
-  template.__index = template
+  if template.add_child then
+    insist(is.callable(template.add_child), "Property `add_child` must be a method.")
+  else
+    template.add_child = add_child
+  end
+
+  if template.add_children then
+    insist(is.callable(template.add_children), "Property `add_children` must be a method.")
+  else
+    template.add_children = add_children
+  end
+
+  if template.children then
+    insist(is.callable(template.children), "Property `children` must be a method.")
+  else
+    template.children = element_children
+  end
+
+  template.bounds       = element_bounds
+  template.size         = element_size
+  template.__index      = template
 end
 
 function Template:from(parent_id)
@@ -192,8 +213,7 @@ function Template:from(parent_id)
     if is.string(k)
     and k ~= "__index"
     and k ~= "bounds"
-    and k ~= "add_child"
-    and k ~= "add_children" then
+    and k ~= "size" then
       self[k] = clone(v)
     end
   end

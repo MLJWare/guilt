@@ -21,7 +21,7 @@ return function (self, mx, my, button, isTouch)
   local gui_tag_bag = ensure(gui.tags, press_tag)
 
   local not_found = true
-  for i, child in ipairs(self.children) do
+  for i, child in self:children() do
     if  not_found
     and contains(child, mx, my)
     and is_callable(child.mousereleased) then

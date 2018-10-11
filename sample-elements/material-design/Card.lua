@@ -14,10 +14,10 @@ local is_callable = pleasure.is.callable
 local Card = guilt.template("Card")
 
 function Card:init()
-  if self.children then
-    pleasure.need.table(self.children)
+  if self._children then
+    pleasure.need.table(self._children)
   else
-    self.children = {}
+    self._children = {}
   end
 end
 
@@ -30,7 +30,7 @@ function Card:draw ()
   smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
   -- content
   pleasure.push_region(x, y, width, height)
-  for i, child in ipairs(self.children) do
+  for i, child in self:children() do
     pleasure.try.invoke(child, "draw")
   end
   pleasure.pop_region()

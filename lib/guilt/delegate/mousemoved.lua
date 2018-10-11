@@ -22,7 +22,7 @@ return function (self, mx, my, dx, dy)
   local gui_pressed2_bag = gui.tags.pressed2
 
   local not_found = true
-  for i, child in ipairs(self.children) do
+  for i, child in self:children() do
     if  not_found
     and contains(child, mx, my)
     and is_callable(child.mousemoved) then

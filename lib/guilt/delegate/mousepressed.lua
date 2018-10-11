@@ -23,7 +23,7 @@ return function (self, mx, my, button, isTouch)
   local gui_tag_bag = ensure(gui.tags, press_tag)
 
   local not_found = true
-  for i, child in ipairs(self.children) do
+  for i, child in self:children() do
     child.active = nil
     if contains(child, mx, my) then
       gui_tag_bag[child] = true
