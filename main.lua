@@ -134,7 +134,7 @@ function love.load(arg)
         local width, height = self:size()
         local dx, dy = (mx - self.x)/width, (my - self.y)/height
         print(("Pressed the %q button at: (%.2f, %.2f)"):format(self.text, dx, dy))
-        textfield.password = true
+        textfield.texttype = "password"
       end;
     }),
     gui:new("Button", {
@@ -147,7 +147,7 @@ function love.load(arg)
       mouseclicked = function (self, mx, my)
         local dx, dy = mx - self.x, my - self.y
         print(("Pressed the %q button"):format(self.text))
-        textfield.password = false
+        textfield.texttype = nil
       end;
     }),
     scale_buttons,

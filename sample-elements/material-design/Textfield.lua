@@ -74,7 +74,7 @@ end
 
 function Textfield:text_as_shown()
   local text = self.text
-  if self.password then
+  if self.texttype == "password" then
     text = ("*"):rep(unicode.len(text))
   end
   return text
@@ -156,7 +156,7 @@ function Textfield:_paste_text(input)
   else
     start, stop = old_caret, old_caret
   end
-
+  input = input:gsub("\n", "")
   self.text = unicode.splice(self.text, start, input, stop - start)
   self.caret = start + unicode.len(input)
 end
@@ -166,7 +166,7 @@ function Textfield:textinput (input)
 end
 
 function Textfield:_copy_to_clipboard()
-  if self.password then return end
+  if self.texttype == "password" then return end
   local select, old_caret = self.select, self.caret
   if not select then return end
   local from, to = minmax(select, old_caret)
@@ -176,8 +176,6 @@ end
 
 function Textfield:keypressed (key, scancode, isrepeat)
   local select, old_caret = self.select, self.caret
-
-  -- TODO ctrl-a, ctrl-c, ctrl-v, ctrl-x
 
   local ctrl_is_down = ctrl_is_down()
 
