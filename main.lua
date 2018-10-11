@@ -89,7 +89,7 @@ function love.load(arg)
   })
 
   scale_buttons:add_child(gui:new("Button", {
-    text     = "Scale +++++++++++++++++++++++++++++++";
+    text     = "Scale +";
     anchor_x = 0.5;
     align_x  = 0.5;
     anchor_y = 0.5;
