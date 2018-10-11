@@ -81,37 +81,6 @@ function GridLayout:region_of(child)
   end
 end
 
---TODO override `add_child`, `add_children`, `children` methods
-
---[[
-function GridLayout:draw () --TODO make delegated version hereof
-  local content = self.content
-  local column_count = self.column_count
-  local row_count    = self.row_count
-
-  local x, y, width, height = self:bounds()
-  local cell_width  = width/column_count
-  local cell_height = height/row_count
-
-  pleasure.push_region(x, y, width, height)
-  for j = 1, row_count do
-    local cell_y = (j-1)*cell_height
-    local j_index = (j-1)*column_count
-    for i = 1, column_count do
-      local cell_x = (i-1)*cell_width
-      smooth_rectangle(cell_x, cell_y, cell_width, cell_height, 0, ((i+j)%2==0) and rgb(128, 131, 133) or rgb(91, 195, 252))
-      local child = self.content[i + j_index]
-      if child then
-        pleasure.push_region(cell_x, cell_y, cell_width, cell_height)
-        try_invoke(child, "draw")
-        pleasure.pop_region()
-      end
-    end
-  end
-  pleasure.pop_region()
-end
---]]
-
 GridLayout.draw          = require "lib.guilt.delegate.draw"
 GridLayout.mousepressed  = require "lib.guilt.delegate.mousepressed"
 GridLayout.mousemoved    = require "lib.guilt.delegate.mousemoved"
