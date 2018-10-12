@@ -214,6 +214,8 @@ function guilt.finalize_template(template)
   template.bounds       = element_bounds
   template.size         = element_size
   template.__index      = template
+
+  template._kind_ = _templates[template]
 end
 
 function Template:from(parent_id)

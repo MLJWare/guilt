@@ -8,6 +8,11 @@ local function ensure(condition, specific, id)
   error(("Property `%s` must be %s."):format(id, specific), 3)
 end
 
+local function ensure_kind(value, kind, id)
+  if is.kind(value, kind) then return end
+  error(("Property `%s` must be of kind %q."):format(id, kind), 5)
+end
+
 function need.number(value, id)
   ensure(is.number(value), "a number", id)
 end
@@ -54,6 +59,12 @@ end
 
 function need.table(value, id)
   ensure(is.table(value), "a table", id)
+end
+
+function need.kind(kind)
+  return function (value, id)
+    ensure_kind(value, kind, id)
+  end
 end
 
 return need
