@@ -22,6 +22,9 @@ function Card:init()
   end
 end
 
+function Card:child_at_index(index)
+  return self._children[index]
+end
 
 function Card:draw ()
   local x, y, width, height = self:bounds()
