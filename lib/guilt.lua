@@ -48,7 +48,7 @@ local function element_bounds(self)
 end
 
 local function element_children(self)
-  return next, self._children, 0
+  return ipairs(self._children)
 end
 
 local function element_region_of(self, child)
@@ -74,12 +74,12 @@ local function _new(template, props)
   local self = props or {}
   for k, v in pairs(template) do
     if not (is.string(k) and k:find("^__"))
-    and not props[k] then
+    and not self[k] then
       self[k] = clone(v)
     end
   end
   setmetatable(self, template)
-  self:init()
+  pleasure.try.invoke(self, "init")
   return self
 end
 
