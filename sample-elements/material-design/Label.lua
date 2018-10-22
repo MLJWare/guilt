@@ -23,7 +23,7 @@ end
 function Label:draw ()
   local x, y, width, height = self:bounds()
   local cx, cy = x + width/2, y + height/2
-  love.graphics.setColor(self.color or  rgb(255, 255, 255))
+  love.graphics.setColor(self.text_color or  rgb(255, 255, 255))
   font_writer.print_aligned(self.font, self.text, cx, cy, "middle", "center")
 end
 
