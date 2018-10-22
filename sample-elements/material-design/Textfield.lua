@@ -20,6 +20,11 @@ local Textfield = guilt.template("Textfield"):needs{
   hint   = pleasure.need.string;
 }
 
+Textfield.text_color = rgb(0, 0, 0)
+Textfield.hint_color = rgba(0, 0, 0, 0.3)
+
+Textfield.double_click_delay = 0.5
+
 local min_width = 280
 local height    =  56
 local x_pad     =  12
@@ -94,11 +99,11 @@ function Textfield:draw_default ()
     local dy = height/2
 
     if #text == 0 then
-      love.graphics.setColor(rgba(0, 0, 0, 0.3))
+      love.graphics.setColor(self.hint_color)
       font_writer.print_aligned(font, self.hint, 0, dy, "left", "center")
     else
       -- TODO if text is to long, add elipsis near right border
-      love.graphics.setColor(rgba(0, 0, 0, 0.8))
+      love.graphics.setColor(self.text_color)
       font_writer.print_aligned(font, text, 0, dy, "left", "center")
     end
   end
@@ -139,8 +144,8 @@ function Textfield:draw_active ()
       smooth_rectangle(from_x, dy - fh/2, size, fh, 0, rgb(30, 147, 213))
     end
 
-    love.graphics.setColor(rgb(0, 0, 0))
-    font_writer.print_aligned(font, text, 1, dy, "left", "center")
+    love.graphics.setColor(self.text_color)
+    font_writer.print_aligned(font, text, 0, dy - 1, "left", "center")
   end
 
   pleasure.pop_region()
@@ -174,6 +179,39 @@ function Textfield:_copy_to_clipboard()
   love.system.setClipboardText(clip)
 end
 
+function Textfield:_select_all ()
+  self.select = 1
+  self:_set_caret(unicode.len(self.text) + 1, true)
+end
+
+function Textfield:_word_start()
+  local pos = self.caret
+
+  while pos > 1
+  and unicode.is_letters(unicode.sub(self.text, pos - 1, pos - 1)) do
+    pos = pos - 1
+  end
+
+  return pos
+end
+
+function Textfield:_word_end()
+  local text_len = unicode.len(self.text)
+  local pos = self.caret
+
+  while pos <= text_len
+  and unicode.is_letters(unicode.sub(self.text, pos, pos)) do
+    pos = pos + 1
+  end
+
+  return pos
+end
+
+function Textfield:_select_word ()
+  self.select = self:_word_start()
+  self:_set_caret(math.max(self:_word_end(), self.select + 1), true)
+end
+
 function Textfield:keypressed (key, scancode, isrepeat)
   local select, old_caret = self.select, self.caret
 
@@ -181,8 +219,7 @@ function Textfield:keypressed (key, scancode, isrepeat)
 
   if ctrl_is_down then
     if key == "a" then
-      self:_set_caret(1)
-      self.select = unicode.len(self.text) + 1
+      self:_select_all()
       return
     elseif key == "c" then
       self:_copy_to_clipboard()
@@ -212,18 +249,9 @@ function Textfield:keypressed (key, scancode, isrepeat)
   end
 
   if key == "left" then
-    repeat
-      self:_set_caret(self.caret - 1)
-    until not ctrl_is_down
-    or self.caret <= 1
-    or not unicode.is_letters(unicode.sub(self.text, self.caret - 1, self.caret - 1))
+    self:_set_caret(math.min(ctrl_is_down and self:_word_start() or math.huge, self.caret - 1))
   elseif key == "right" then
-    local text_len = unicode.len(self.text)
-    repeat
-      self:_set_caret(self.caret + 1)
-    until not ctrl_is_down
-    or self.caret > text_len
-    or not unicode.is_letters(unicode.sub(self.text, self.caret, self.caret))
+    self:_set_caret(math.max(ctrl_is_down and self:_word_end() or 0, self.caret + 1))
   elseif key == "home" then
     self:_set_caret(1)
   elseif key == "end" then
@@ -245,11 +273,24 @@ end
 
 function Textfield:mousepressed (mx, my, button_index)
   self.active = true
-  self:_set_caret(self:_mouse_index(mx, my))
+
+  local new_caret  = self:_mouse_index(mx, my)
+  local last_press = self._last_press
+  local timestamp  = love.timer.getTime()
+
+  if self.caret == new_caret
+  and last_press
+  and last_press + self.double_click_delay > timestamp then
+    self._last_press = nil
+    self:_select_word()
+  else
+    self._last_press = timestamp
+    self:_set_caret(new_caret)
+  end
 end
 
 function Textfield:mousedragged (mx, my, dx, dy, button1, button2)
-  if not button1 then return end
+  if not button1 or not self._last_press then return end
   self:_set_caret(self:_mouse_index(mx, my), true)
 end
 
