@@ -3,6 +3,7 @@ love.graphics.setDefaultFilter("nearest", "nearest")
 local guilt                   = require "lib.guilt"
 local pleasure                = require "lib.guilt.pleasure"
 local rgb                     = require "lib.color.rgb"
+local rgba                    = require "lib.color.rgba"
 local smooth_rectangle        = require "utils.smooth_rectangle"
 
 local try_invoke  = pleasure.try.invoke
@@ -62,7 +63,8 @@ function love.load(arg)
     x =  10;
     y = 140;
     hint = "No selection";
-    color = rgb(4, 114, 215);
+    text_color = rgb(4, 114, 215);
+    hint_color = rgba(4, 114, 215, 0.5);
   })
 
   local group = gui:new("RadioGroup", {
@@ -74,17 +76,17 @@ function love.load(arg)
 
   card:add_children(
     gui:new("RadioButton", { group = group; x = 20; y =  20; id = 1}),
-    gui:new("Label", { x = 40; y =  20; text = "Option 1", color = rgb(4, 114, 215)}),
+    gui:new("Label", { x = 40; y =  20; text = "Option 1", text_color = rgb(4, 114, 215)}),
     gui:new("RadioButton", { group = group; x = 20; y =  40; id = 2}),
-    gui:new("Label", { x = 40; y =  40; text = "Option 2", color = rgb(4, 114, 215)}),
+    gui:new("Label", { x = 40; y =  40; text = "Option 2", text_color = rgb(4, 114, 215)}),
     gui:new("RadioButton", { group = group; x = 20; y =  60; id = 3}),
-    gui:new("Label", { x = 40; y =  60; text = "Option 3", color = rgb(4, 114, 215)}),
+    gui:new("Label", { x = 40; y =  60; text = "Option 3", text_color = rgb(4, 114, 215)}),
     gui:new("RadioButton", { group = group; x = 20; y =  80; id = 4}),
-    gui:new("Label", { x = 40; y =  80; text = "Option 4", color = rgb(4, 114, 215)}),
+    gui:new("Label", { x = 40; y =  80; text = "Option 4", text_color = rgb(4, 114, 215)}),
     gui:new("RadioButton", { group = group; x = 20; y = 100; id = 5}),
-    gui:new("Label", { x = 40; y = 100; text = "Option 5", color = rgb(4, 114, 215)}),
+    gui:new("Label", { x = 40; y = 100; text = "Option 5", text_color = rgb(4, 114, 215)}),
     gui:new("RadioButton", { group = group; x = 20; y = 120; id = 6}),
-    gui:new("Label", { x = 40; y = 120; text = "Option 6", color = rgb(4, 114, 215)}),
+    gui:new("Label", { x = 40; y = 120; text = "Option 6", text_color = rgb(4, 114, 215)}),
     info
   )
 

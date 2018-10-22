@@ -1371,6 +1371,12 @@ local UPPER_TO_LOWER = {
   [0xFF39] = 0xFF59;
   [0xFF3A] = 0xFF5A;
 }
+local WHITESPACE = {
+  [ 9] = true;
+  [10] = true;
+  [13] = true;
+  [32] = true;
+}
 
 function unicode.upper(text)
   local upper, char, insert = LOWER_TO_UPPER, utf8.char, table.insert
@@ -1394,6 +1400,54 @@ function unicode.is_letters(text)
   local upper, lower = UPPER_TO_LOWER, LOWER_TO_UPPER
   for _, cc in utf8.codes(text) do
     if not (upper[cc] or lower[cc]) then return false end
+  end
+  return true
+end
+
+function unicode.is_whitespace(text)
+  local whitespace = WHITESPACE
+  for _, cc in utf8.codes(text) do
+    if not whitespace[cc] then return false end
+  end
+  return true
+end
+
+function unicode.is_letters_or_whitespace(text)
+  local upper, lower, whitespace = UPPER_TO_LOWER, LOWER_TO_UPPER, WHITESPACE
+  for _, cc in utf8.codes(text) do
+    if not (upper[cc] or lower[cc] or whitespace[cc]) then return false end
+  end
+  return true
+end
+
+function unicode.is_upper(text)
+  local upper = UPPER_TO_LOWER
+  for _, cc in utf8.codes(text) do
+    if not upper[cc] then return false end
+  end
+  return true
+end
+
+function unicode.is_upper_or_whitespace(text)
+  local upper, whitespace = UPPER_TO_LOWER, WHITESPACE
+  for _, cc in utf8.codes(text) do
+    if not (upper[cc] or whitespace[cc]) then return false end
+  end
+  return true
+end
+
+function unicode.is_lower(text)
+  local lower = LOWER_TO_UPPER
+  for _, cc in utf8.codes(text) do
+    if not lower[cc] then return false end
+  end
+  return true
+end
+
+function unicode.is_lower_or_whitespace(text)
+  local lower, whitespace = LOWER_TO_UPPER, WHITESPACE
+  for _, cc in utf8.codes(text) do
+    if not (lower[cc] or whitespace[cc]) then return false end
   end
   return true
 end

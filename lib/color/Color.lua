@@ -72,6 +72,11 @@ function Color:darken(pct)
   return Color.from_rgba_pct(r-r*pct, g-g*pct, b-b*pct, a)
 end
 
+function Color:alpha(pct)
+  local r,g,b,a = unpack(self)
+  return Color.from_rgba_pct(r, g, b, a*pct)
+end
+
 Color.BLACK = Color.from_rgba_pct(0,0,0,1)
 Color.WHITE = Color.from_rgba_pct(1,1,1,1)
 
