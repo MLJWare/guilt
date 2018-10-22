@@ -121,7 +121,7 @@ function love.load(arg)
       anchor_y = 0.1;
       align_y = 0.5;
       text   = "GUI sample (based on Material Design)";
-      color  = rgb(18, 38, 121);
+      text_color = rgb(18, 38, 121);
     }),
     gui:new("Button", {
       x = -10;
