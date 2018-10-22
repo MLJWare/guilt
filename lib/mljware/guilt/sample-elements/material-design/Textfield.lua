@@ -1,17 +1,23 @@
-local subpath = (...):match("(.-)[^%.]+$")
-local roboto                  = require (subpath.."roboto")
+local path = (...)
+local sub1 = path:match("(.-)%.[^%.]+$")
+local sub2 = sub1:match("(.-)%.[^%.]+$")
+local sub3 = sub2:match("(.-)%.[^%.]+$")
+local sub4 = sub3:match("(.-)%.[^%.]+$")
 
-local smooth_line             = require "utils.smooth_line"
-local smooth_rectangle        = require "utils.smooth_rectangle"
-local font_writer             = require "utils.font_writer"
+local roboto                  = require (sub1..".roboto")
 
-local guilt                   = require "lib.guilt"
-local pleasure                = require "lib.guilt.pleasure"
-local rgb                     = require "lib.color.rgb"
-local rgba                    = require "lib.color.rgba"
-local clamp                   = require "lib.math.clamp"
-local minmax                  = require "lib.math.minmax"
-local unicode                 = require "lib.unicode"
+local smooth_line             = require (sub2..".utils.smooth_line")
+local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
+local font_writer             = require (sub2..".utils.font_writer")
+
+local guilt                   = require (sub3)
+local pleasure                = require (sub3..".pleasure")
+
+local rgb                     = require (sub4..".color.rgb")
+local rgba                    = require (sub4..".color.rgba")
+local clamp                   = require (sub4..".math.clamp")
+local minmax                  = require (sub4..".math.minmax")
+local unicode                 = require (sub4..".unicode")
 
 local function ctrl_is_down () return love.keyboard.isDown("lctrl" , "rctrl" ) end
 local function shift_is_down() return love.keyboard.isDown("lshift", "rshift") end

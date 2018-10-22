@@ -1,12 +1,12 @@
-local roboto                  = require ("sample-elements.material-design.roboto")
+local roboto                  = require "lib.mljware.guilt.sample-elements.material-design.roboto"
 
-local smooth_rectangle        = require "utils.smooth_rectangle"
-local font_writer             = require "utils.font_writer"
+local smooth_rectangle        = require "lib.mljware.guilt.sample-elements.utils.smooth_rectangle"
+local font_writer             = require "lib.mljware.guilt.sample-elements.utils.font_writer"
 
-local guilt                   = require "lib.guilt"
-local pleasure                = require "lib.guilt.pleasure"
-local rgb                     = require "lib.color.rgb"
-local rgba                    = require "lib.color.rgba"
+local guilt                   = require "lib.mljware.guilt"
+local pleasure                = require "lib.mljware.guilt.pleasure"
+local rgb                     = require "lib.mljware.color.rgb"
+local rgba                    = require "lib.mljware.color.rgba"
 
 -- Example showing how to extend/override existing UI elements using the
 -- `Template:from` method.

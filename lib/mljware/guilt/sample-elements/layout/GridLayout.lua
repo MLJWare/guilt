@@ -1,12 +1,18 @@
-local roboto                  = require ("sample-elements.material-design.roboto")
+local path = (...)
+local sub1 = path:match("(.-)%.[^%.]+$")
+local sub2 = sub1:match("(.-)%.[^%.]+$")
+local sub3 = sub2:match("(.-)%.[^%.]+$")
+local sub4 = sub3:match("(.-)%.[^%.]+$")
 
-local smooth_rectangle        = require "utils.smooth_rectangle"
-local font_writer             = require "utils.font_writer"
+local roboto                  = require (sub2..".material-design.roboto")
 
-local guilt                   = require "lib.guilt"
-local pleasure                = require "lib.guilt.pleasure"
-local rgb                     = require "lib.color.rgb"
-local rgba                    = require "lib.color.rgba"
+local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
+local font_writer             = require (sub2..".utils.font_writer")
+
+local guilt                   = require (sub3)
+local pleasure                = require (sub3..".pleasure")
+local rgb                     = require (sub4..".color.rgb")
+local rgba                    = require (sub4..".color.rgba")
 
 local is_callable = pleasure.is.callable
 local try_invoke  = pleasure.try.invoke
@@ -81,12 +87,12 @@ function GridLayout:region_of(child)
   end
 end
 
-GridLayout.draw          = require "lib.guilt.delegate.draw"
-GridLayout.mousepressed  = require "lib.guilt.delegate.mousepressed"
-GridLayout.mousemoved    = require "lib.guilt.delegate.mousemoved"
-GridLayout.mousereleased = require "lib.guilt.delegate.mousereleased"
-GridLayout.textinput     = require "lib.guilt.delegate.textinput"
-GridLayout.keypressed    = require "lib.guilt.delegate.keypressed"
-GridLayout.keyreleased   = require "lib.guilt.delegate.keyreleased"
+GridLayout.draw          = require "lib.mljware.guilt.delegate.draw"
+GridLayout.mousepressed  = require "lib.mljware.guilt.delegate.mousepressed"
+GridLayout.mousemoved    = require "lib.mljware.guilt.delegate.mousemoved"
+GridLayout.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
+GridLayout.textinput     = require "lib.mljware.guilt.delegate.textinput"
+GridLayout.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
+GridLayout.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
 
 guilt.finalize_template(GridLayout)

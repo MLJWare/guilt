@@ -1,32 +1,18 @@
 love.graphics.setDefaultFilter("nearest", "nearest")
 
-local guilt                   = require "lib.guilt"
-local pleasure                = require "lib.guilt.pleasure"
-local rgb                     = require "lib.color.rgb"
-local rgba                    = require "lib.color.rgba"
-local smooth_rectangle        = require "utils.smooth_rectangle"
+local guilt                   = require "lib.mljware.guilt"
+local pleasure                = require "lib.mljware.guilt.pleasure"
+local rgb                     = require "lib.mljware.color.rgb"
+local rgba                    = require "lib.mljware.color.rgba"
+local smooth_rectangle        = require "lib.mljware.guilt.sample-elements.utils.smooth_rectangle"
 
 local try_invoke  = pleasure.try.invoke
 local contains    = pleasure.contains
 local is_callable = pleasure.is.callable
 
-for i, element in ipairs(love.filesystem.getDirectoryItems("sample-elements/material-design")) do
-  if element:find("^[A-Z][^%.]*%.lua$") then
-    require ("sample-elements.material-design."..element:sub(1, -5))
-  end
-end
-
-for i, element in ipairs(love.filesystem.getDirectoryItems("sample-elements/layout")) do
-  if element:find("^[A-Z][^%.]*%.lua$") then
-    require ("sample-elements.layout."..element:sub(1, -5))
-  end
-end
-
-for i, element in ipairs(love.filesystem.getDirectoryItems("samples")) do
-  if element:find("^[A-Z][^%.]*%.lua$") then
-    require ("samples."..element:sub(1, -5))
-  end
-end
+require "lib.mljware.guilt.sample-elements.material-design"
+require "lib.mljware.guilt.sample-elements.layout"
+require "samples"
 
 local gui, card, textfield, scroll_h, scroll_v
 local square

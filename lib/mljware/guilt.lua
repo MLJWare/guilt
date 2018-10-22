@@ -155,12 +155,12 @@ GUI.add_child     = add_child
 GUI.add_children  = add_children
 GUI.region_of     = element_region_of
 GUI.children      = element_children
-GUI.mousepressed  = require "lib.guilt.delegate.mousepressed"
-GUI.mousemoved    = require "lib.guilt.delegate.mousemoved"
-GUI.mousereleased = require "lib.guilt.delegate.mousereleased"
-GUI.textinput     = require "lib.guilt.delegate.textinput"
-GUI.keypressed    = require "lib.guilt.delegate.keypressed"
-GUI.keyreleased   = require "lib.guilt.delegate.keyreleased"
+GUI.mousepressed  = require "lib.mljware.guilt.delegate.mousepressed"
+GUI.mousemoved    = require "lib.mljware.guilt.delegate.mousemoved"
+GUI.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
+GUI.textinput     = require "lib.mljware.guilt.delegate.textinput"
+GUI.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
+GUI.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
 
 function guilt.template(template_id)
   insist(is.string(template_id), "Template id must be a string.")
