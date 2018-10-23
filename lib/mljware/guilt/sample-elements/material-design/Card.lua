@@ -14,7 +14,6 @@ local pleasure                = require (sub3..".pleasure")
 
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
-local delegate_draw           = require (sub4..".guilt.delegate.draw")
 
 local is_callable = pleasure.is.callable
 
@@ -32,6 +31,7 @@ function Card:child_at_index(index)
   return self._children[index]
 end
 
+
 function Card:draw ()
   local x, y, width, height = self:bounds()
 
@@ -40,14 +40,15 @@ function Card:draw ()
   -- card
   smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
   -- content
-  delegate_draw(self)
+  self:delegate_draw()
 end
 
-Card.mousepressed  = require "lib.mljware.guilt.delegate.mousepressed"
-Card.mousemoved    = require "lib.mljware.guilt.delegate.mousemoved"
-Card.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
-Card.textinput     = require "lib.mljware.guilt.delegate.textinput"
-Card.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
-Card.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
+Card.delegate_draw = require (sub3..".delegate.draw")
+Card.mousepressed  = require (sub3..".delegate.mousepressed")
+Card.mousemoved    = require (sub3..".delegate.mousemoved")
+Card.mousereleased = require (sub3..".delegate.mousereleased")
+Card.textinput     = require (sub3..".delegate.textinput")
+Card.keypressed    = require (sub3..".delegate.keypressed")
+Card.keyreleased   = require (sub3..".delegate.keyreleased")
 
 guilt.finalize_template(Card)
