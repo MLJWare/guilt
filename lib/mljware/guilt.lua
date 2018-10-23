@@ -218,6 +218,16 @@ function guilt.finalize_template(template)
   template._kind_ = _templates[template]
 end
 
+function guilt.template_try_call(template_id, method_id, ...)
+  insist(is.string(template_id), "First argument to `guilt.template_invoke` must be a string referencing a previously finalized Template.")
+  local template = _templates[template_id]
+  insist(is.string(method_id), "Second argument to `guilt.template_invoke` must be a string referencing a method on the template.")
+  local method = template[method_id]
+  if method and is.callable(method) then
+    return method(...)
+  end
+end
+
 function Template:from(parent_id)
   insist(is.string(parent_id), "Argument to `Template:from` must be a string referencing a previously finalized Template.")
   local parent = _templates[parent_id]
