@@ -29,10 +29,13 @@ function ScrollV:init()
   self.preferred_width = self.preferred_width or 9
 end
 
-function ScrollV:set_progress(progress)
+function ScrollV:set_progress(progress, no_event)
+  local old_progress = self.progress
   self.progress = (progress == progress)
               and clamp(progress, 0, 1)
                or 0
+  if no_event then return end
+  pleasure.try.invoke(self, "on_change", old_progress)
 end
 
 function ScrollV:draw()
@@ -40,25 +43,25 @@ function ScrollV:draw()
   local knob_height = self.knob_height
   local knob_y = y + (height - knob_height)*self.progress
 
-  local r1 = (width-1)/2
-  local r2 = (width-2)/2
+  self:draw_bar(x, y, width, height, knob_y, knob_height)
+  self:draw_knob(x, y, width, height, knob_y, knob_height)
+end
 
-  -- bar
+function ScrollV:draw_bar(x, y, width, height, knob_y, knob_height)
   smooth_line(x + width/2, y, x + width/2, y + height, 1, rgb(6, 138, 79))
+end
 
-  --knob
-  smooth_rectangle(x, knob_y+2, width, knob_height - 2, r2, rgba(0, 0, 0, 0.5))
-  smooth_rectangle(x, knob_y+1, width, knob_height - 2, r2, rgb(13, 213, 109))
+function ScrollV:draw_knob(x, y, width, height, knob_y, knob_height)
+  local r = width/2
+  smooth_rectangle(x, knob_y+2, width, knob_height - 2, r, rgba(0, 0, 0, 0.5))
+  smooth_rectangle(x, knob_y+1, width, knob_height - 2, r, rgb(13, 213, 109))
 end
 
 function ScrollV:mousedragged (mx, my, dx, dy, button1, button2)
   if not button1 then return end
-  local old_progress = self.progress
-
   local _, y, _, height = self:bounds()
 
   self:set_progress(((my - self._knob_dy) - y)/(height - self.knob_height))
-  pleasure.try.invoke(self, "on_change", old_progress)
 end
 
 function ScrollV:mousepressed (mx, my, button_index)
@@ -79,7 +82,6 @@ function ScrollV:mousepressed (mx, my, button_index)
     self._knob_dy = knob_height/2
     -- clicked directly on the line, update `progress` value
     self:set_progress((my - y - knob_height/2)/(height - knob_height))
-    pleasure.try.invoke(self, "on_change", old_progress)
   end
 end
 
