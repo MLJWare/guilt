@@ -16,6 +16,7 @@ return function (self, mx, my, dx, dy)
 
   local scale = self.render_scale or 1
   mx, my = mx/scale, my/scale
+  dx, dy = dx/scale, dy/scale
 
   local gui = self._guilt_gui_
   local gui_pressed1_bag = gui.tags.pressed1
