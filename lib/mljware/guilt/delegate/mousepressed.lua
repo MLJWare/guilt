@@ -39,7 +39,4 @@ return function (self, mx, my, button, isTouch)
       end
     end
   end
-
-  if branch_element then
-  end
 end
