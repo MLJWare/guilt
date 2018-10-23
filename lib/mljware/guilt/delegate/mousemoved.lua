@@ -2,10 +2,10 @@ local subsubpath = (...):match("(.-)[^%.]+%.[^%.]+$")
 
 local ensure = require (subsubpath.."pleasure.ensure")
 
-local contains, is_callable, try_invoke
+local is_callable, try_invoke
 do
   local pleasure = require (subsubpath.."pleasure")
-  contains, is_callable, try_invoke = pleasure.contains, pleasure.is.callable, pleasure.try.invoke
+  is_callable, try_invoke = pleasure.is.callable, pleasure.try.invoke
 end
 
 return function (self, mx, my, dx, dy)
@@ -29,7 +29,7 @@ return function (self, mx, my, dx, dy)
     if  not_found
     and mx >= 0 and (region_width or math.huge) > mx
     and my >= 0 and (region_width or math.huge) > my
-    and contains(child, mx, my)
+    and child:contains(mx, my)
     and is_callable(child.mousemoved) then
       child:mousemoved(mx, my, dx, dy)
       not_found = false

@@ -5,8 +5,6 @@ local pleasure                = require "lib.mljware.guilt.pleasure"
 local rgb                     = require "lib.mljware.color.rgb"
 
 local try_invoke  = pleasure.try.invoke
-local contains    = pleasure.contains
-local is_callable = pleasure.is.callable
 
 require "lib.mljware.guilt.sample-elements.material-design"
 require "lib.mljware.guilt.sample-elements.layout"

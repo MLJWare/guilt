@@ -2,10 +2,10 @@ local subsubpath = (...):match("(.-)[^%.]+%.[^%.]+$")
 
 local ensure = require (subsubpath.."pleasure.ensure")
 
-local contains, is_callable, try_invoke
+local is_callable, try_invoke
 do
   local pleasure = require (subsubpath.."pleasure")
-  contains, is_callable, try_invoke = pleasure.contains, pleasure.is.callable, pleasure.try.invoke
+  is_callable, try_invoke = pleasure.is.callable, pleasure.try.invoke
 end
 
 return function (self, mx, my, button, isTouch)
@@ -27,14 +27,14 @@ return function (self, mx, my, button, isTouch)
     if  not_found
     and mx >= 0 and (region_width or math.huge) > mx
     and my >= 0 and (region_width or math.huge) > my
-    and contains(child, mx, my)
+    and child:contains(mx, my)
     and is_callable(child.mousereleased) then
       child:mousereleased(mx, my, button, isTouch)
       not_found = false
     end
 
     if gui_tag_bag[child] then
-      if contains(child, mx, my) then
+      if child:contains(mx, my) then
         try_invoke(child, "mouseclicked", mx, my, button)
       end
     end

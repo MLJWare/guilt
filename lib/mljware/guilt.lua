@@ -51,6 +51,19 @@ local function element_children(self)
   return ipairs(self._children)
 end
 
+local function previous(t, i)
+  i = i - 1
+  if i > 0 then return i, t[i] end
+end
+
+local function reverse_ipairs(t)
+  return previous, t, #t + 1
+end
+
+local function element_reverse_children(self)
+  return reverse_ipairs(self._children)
+end
+
 local function element_region_of(self, child)
   local _, _, width, height = self:bounds()
   return 0, 0, width, height
@@ -138,7 +151,7 @@ function GUI:draw ()
   local x, y, width, height = self:bounds()
   pleasure.push_region(x, y, width*scale, height*scale)
   pleasure.scale(self.render_scale)
-  for i, child in self:children() do
+  for i, child in self:reverse_children() do
     pleasure.try.invoke(child, "draw")
   end
   pleasure.pop_region()
@@ -151,10 +164,13 @@ function GUI:size()
   return self.preferred_width, self.preferred_height
 end
 
+GUI.contains = pleasure.contains
+
 GUI.add_child     = add_child
 GUI.add_children  = add_children
 GUI.region_of     = element_region_of
 GUI.children      = element_children
+GUI.reverse_children = element_reverse_children
 GUI.mousepressed  = require "lib.mljware.guilt.delegate.mousepressed"
 GUI.mousemoved    = require "lib.mljware.guilt.delegate.mousemoved"
 GUI.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
@@ -203,6 +219,18 @@ function guilt.finalize_template(template)
     insist(is.callable(template.children), "Property `children` must be a method.")
   else
     template.children = element_children
+  end
+
+  if template.reverse_children then
+    insist(is.callable(template.reverse_children), "Property `reverse_children` must be a method.")
+  else
+    template.reverse_children = element_reverse_children
+  end
+
+  if template.contains then
+    insist(is.callable(template.contains), "Property `contains` must be a method.")
+  else
+    template.contains = pleasure.contains
   end
 
   if template.region_of then

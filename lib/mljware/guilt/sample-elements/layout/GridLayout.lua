@@ -69,6 +69,27 @@ function GridLayout:children()
   end)
 end
 
+function GridLayout:reverse_children()
+  return coroutine.wrap(function ()
+    local content = self.content
+    local column_count = self.column_count
+    local row_count    = self.row_count
+
+    local _, _, width, height = self:bounds()
+    local cell_width  = width/column_count
+    local cell_height = height/row_count
+
+    for index = column_count*row_count, 1, -1 do
+      local element = content[index]
+      if element then
+        local dx = ((index - 1)%column_count)*cell_width
+        local dy = math.floor((index - 1)/column_count)*cell_height
+        coroutine.yield(index, element, dx, dy, cell_width, cell_height)
+      end
+    end
+  end)
+end
+
 function GridLayout:region_of(child)
   local content = self.content
   local column_count = self.column_count

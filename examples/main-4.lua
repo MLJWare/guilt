@@ -7,8 +7,6 @@ local rgba                    = require "lib.mljware.color.rgba"
 local smooth_rectangle        = require "lib.mljware.guilt.sample-elements.utils.smooth_rectangle"
 
 local try_invoke  = pleasure.try.invoke
-local contains    = pleasure.contains
-local is_callable = pleasure.is.callable
 
 require "lib.mljware.guilt.sample-elements.material-design"
 require "lib.mljware.guilt.sample-elements.layout"
