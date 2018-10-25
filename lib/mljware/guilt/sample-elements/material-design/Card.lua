@@ -19,6 +19,8 @@ local is_callable = pleasure.is.callable
 
 local Card = guilt.template("Card")
 
+Card.fill_color = rgb(255, 255, 255)
+
 function Card:init()
   if self._children then
     pleasure.need.table(self._children)
@@ -38,7 +40,7 @@ function Card:draw ()
   -- drop shadow
   smooth_rectangle(x, y+1, width, height, 2, rgba(0,0,0,0.62))
   -- card
-  smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
+  smooth_rectangle(x, y, width, height, 2, self.fill_color)
   -- content
   self:delegate_draw()
 end
