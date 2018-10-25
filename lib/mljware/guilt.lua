@@ -172,6 +172,7 @@ GUI.region_of     = element_region_of
 GUI.children      = element_children
 GUI.reverse_children = element_reverse_children
 GUI.mousepressed  = require "lib.mljware.guilt.delegate.mousepressed"
+GUI.mousewheelmoved = require "lib.mljware.guilt.delegate.mousewheelmoved"
 GUI.mousemoved    = require "lib.mljware.guilt.delegate.mousemoved"
 GUI.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
 GUI.textinput     = require "lib.mljware.guilt.delegate.textinput"

@@ -28,7 +28,7 @@ return function (self, mx, my, dx, dy)
     -- TODO ensure [mx, my] contained in region
     if  not_found
     and mx >= 0 and (region_width or math.huge) > mx
-    and my >= 0 and (region_width or math.huge) > my
+    and my >= 0 and (region_height or math.huge) > my
     and child:contains(mx, my)
     and is_callable(child.mousemoved) then
       child:mousemoved(mx, my, dx, dy)

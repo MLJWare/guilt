@@ -28,7 +28,7 @@ return function (self, mx, my, button, isTouch)
     -- TODO ensure [mx, my] contained in region
     child.active = nil
     if mx >= 0 and (region_width or math.huge) > mx
-    and my >= 0 and (region_width or math.huge) > my
+    and my >= 0 and (region_height or math.huge) > my
     and child:contains(mx, my) then
       gui_tag_bag[child] = true
       child[press_tag] = true

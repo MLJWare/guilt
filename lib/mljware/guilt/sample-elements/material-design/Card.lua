@@ -33,7 +33,6 @@ function Card:child_at_index(index)
   return self._children[index]
 end
 
-
 function Card:draw ()
   local x, y, width, height = self:bounds()
 
@@ -47,6 +46,7 @@ end
 
 Card.delegate_draw = require (sub3..".delegate.draw")
 Card.mousepressed  = require (sub3..".delegate.mousepressed")
+Card.mousewheelmoved = require (sub3..".delegate.mousewheelmoved")
 Card.mousemoved    = require (sub3..".delegate.mousemoved")
 Card.mousereleased = require (sub3..".delegate.mousereleased")
 Card.textinput     = require (sub3..".delegate.textinput")
