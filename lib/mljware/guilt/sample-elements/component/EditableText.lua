@@ -42,7 +42,7 @@ EditableText.font               = roboto.body1
 function EditableText:set_text(text)
   self.owner.text = tostring(text or "")
   self.select = nil
-  self.caret  = unicode.len(self.owner.text)
+  self.caret  = unicode.len(self.owner.text) + 1
 end
 
 function EditableText:_set_caret(new_caret, select)
@@ -250,7 +250,7 @@ function EditableText:draw_active ()
 
   local text_x = self:_text_x()
 
-  if self.drop_shadow then 
+  if self.drop_shadow then
     smooth_rectangle(x, y + 1, width, height, 2, rgba(0, 0, 0, 0.62))
   end
   -- field
