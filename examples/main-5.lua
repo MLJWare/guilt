@@ -41,6 +41,7 @@ function love.load(arg)
   })
 
   local properties = gui:new("PropertyTable", {
+    column_names = {"Property", "Value", "Kind"};
     anchor_x = 0.5;
     align_x = 0.5;
     anchor_y = 0.5;
@@ -50,22 +51,22 @@ function love.load(arg)
   })
 
   properties:add_group("Map")
-  : insert_row("x", 100)
-  : insert_row("y", 200)
-  : insert_row("width", 45)
-  : insert_row("height", 62)
+  : insert_row("x"      , 100, "number")
+  : insert_row("y"      , 200, "number")
+  : insert_row("width"  ,  45, "number")
+  : insert_row("height" ,  62, "number")
 
   properties:add_group("Tile")
-  : insert_row("id", 52)
-  : insert_row("type", "grass")
+  : insert_row("id"   ,      52, "number")
+  : insert_row("type" , "grass", "string")
   .collapsed = true
 
   properties:add_group("Entity")
-  : insert_row("id", "player-1")
-  : insert_row("type", "player")
-  : insert_row("x", 87)
-  : insert_row("y", 32)
-  : insert_row("health", 100)
+  : insert_row("id"     , "player-1", "string")
+  : insert_row("type"   , "player"  , "string")
+  : insert_row("x"      ,         87, "number")
+  : insert_row("y"      ,         32, "number")
+  : insert_row("health" ,        100, "number")
 
   card:add_child(properties)
 

@@ -55,7 +55,8 @@ function is.table(value)
 end
 
 function is.kind(value, kind)
-  if type(value) ~= "table" then return false end
+  local value_type = type(value)
+  if value_type ~= "table" then return value_type == kind end
   local meta = getmetatable(value)
   return type(meta) == "table"
      and meta._kind_ == kind

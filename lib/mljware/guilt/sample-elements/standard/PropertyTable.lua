@@ -21,6 +21,8 @@ local clamp                   = require (sub4..".math.clamp")
 local minmax                  = require (sub4..".math.minmax")
 local unicode                 = require (sub4..".unicode")
 
+local group_gen               = require (sub1..".group-gen")
+
 local function ctrl_is_down () return love.keyboard.isDown("lctrl" , "rctrl" ) end
 local function shift_is_down() return love.keyboard.isDown("lshift", "rshift") end
 
@@ -50,8 +52,6 @@ end
 
 local try_invoke = pleasure.try.invoke
 
-local PropertyTable = guilt.template("PropertyTable")
-
 local font = roboto.body2
 
 local wedge_open   = love.graphics.newImage(("%s/res/img/wedge/open.png"):format(sub2:gsub("%.", "/")))
@@ -66,80 +66,19 @@ local row_mid_y  = row_height/2
 local outline_color = rgb(144, 150, 169)
 local fill_color    = rgb(255, 255, 255)
 
-local Group = {}
-do
-  Group.__index = Group
-
-  function Group.new(class, id)
-    local self = setmetatable({
-      id = id;
-      _data = {}
-    }, class)
-    return self
-  end
-
-  function Group:insert_row(key, value, opt_row_index)
-    local data = self._data
-    if opt_row_index then
-      local index = 2*clamp(opt_row_index, 1, #data + 1)
-      table.insert(self._data, index - 1, tostring(key   or "") or "")
-      table.insert(self._data, index    , tostring(value or "") or "")
-    else
-      table.insert(self._data, tostring(key   or "") or "")
-      table.insert(self._data, tostring(value or "") or "")
-    end
-    return self
-  end
-
-  function Group:get_row(row_index)
-    local data = self._data
-    local index = 2*row_index
-    return data[index - 1], data[index]
-  end
-
-  -- NOTE assumes the row _already_ exists!
-  function Group:set_row(row_index, key, value)
-    local data = self._data
-    local index = 2*row_index
-    data[index - 1] = tostring(key   or "") or ""
-    data[index    ] = tostring(value or "") or ""
-  end
-
-  function Group:get_field(index)
-    return self._data[index]
-  end
-
-  -- NOTE assumes the field _already_ exists!
-  function Group:set_field(index, text)
-    self._data[index] = tostring(text or "") or ""
-  end
-
-  function Group:len()
-    return math.ceil(#self._data/2)
-  end
-
-  function Group:rows()
-    return coroutine.wrap(function ()
-      local data = self._data
-      for row_index = 1, self:len() do
-        local index = row_index*2
-        coroutine.yield(data[index - 1], data[index], row_index)
-      end
-    end)
-  end
-end
-
 local Groups = {}
 do
   Groups.__index = Groups
 
-  function Groups.new(class)
+  function Groups.new(class, element_count)
     local self = setmetatable({}, class)
+
+    self.Group = group_gen(element_count)
     return self
   end
 
   function Groups:add_group(group_id, opt_group_index)
-    local group = Group:new(group_id)
+    local group = self.Group:new(group_id)
     if opt_group_index then
       table.insert(self, opt_group_index, group)
     else
@@ -149,10 +88,15 @@ do
   end
 end
 
+local PropertyTable = guilt.template("PropertyTable"):needs{
+  column_names = pleasure.need.table_of("string");
+}
+
 function PropertyTable:init()
   self.keys_id   = self.keys_id   or "Property"
   self.values_id = self.values_id or "Value"
-  self._groups   = Groups:new()
+  local column_count = #self.column_names
+  self._groups   = Groups:new(column_count)
   self._field = {
     text = "";
     hint = "";
@@ -163,7 +107,10 @@ function PropertyTable:init()
   self._edit_ = EditableText:new(self._field)
   self._edit_.x_pad = x_pad
   self._edit_.font = font
-  self.split_pct = 0.4
+  self.split_pcts = {[0] = 0}
+  for i = 1, column_count do
+    self.split_pcts[i] = i/column_count
+  end
 end
 
 function PropertyTable:add_group(group_id, opt_group_index)
@@ -179,19 +126,42 @@ function PropertyTable:_find_field_at(mx, my)
   mx, my = mx - x, my - y
 
   local dy = row_height
+
+  if my < row_height then return nil, -1 end
+
   for _, group in ipairs(self._groups) do
     local new_dy = dy + row_height
     if not group.collapsed then
       new_dy = new_dy + group:len()*row_height
     end
     if new_dy > my then
-      local split_width = self.split_pct*width
+      local prev_width, index = 0
+      local column_count = #self.column_names
       local row_index    = math.floor((my - dy)/row_height)
-      local index = (mx < split_width) and row_index*2 - 1 or row_index*2
-      return group, index
+      for i = 1, column_count do
+        local split_width = self.split_pcts[i]*width
+        if prev_width <= mx and mx < split_width then
+          return group, (row_index - 1)*column_count + i
+        end
+        prev_width = split_width
+      end
+      return nil, -1
     end
     dy = new_dy
   end
+end
+
+function PropertyTable:_column_dx_width(column_index)
+  local _, _, width = self:bounds()
+
+  local split_pcts = self.split_pcts
+  local split_pct  = split_pcts[column_index]
+  local split_pct_prev = split_pcts[column_index - 1]
+
+  local dx          = split_pct_prev*width
+  local field_width = (split_pct - split_pct_prev)*width
+
+  return dx, field_width
 end
 
 function PropertyTable:_active_field_bounds()
@@ -199,16 +169,12 @@ function PropertyTable:_active_field_bounds()
   local index = self._active_index
   if not (group and index) then return 0,0,0,0 end
 
-  local _, _, width = self:bounds()
-  local split_width = self.split_pct*width
-  local dx, field_width
-  if index%2 == 1 then
-    dx, field_width = 0, split_width
-  else
-    dx, field_width = split_width, width - split_width
-  end
+  local column_count = #self.column_names
+  local column_index = 1 + ((index - 1)%column_count)
 
-  local dy = row_height*math.floor((index+1)/2)
+  local dx, field_width = self:_column_dx_width(column_index)
+
+  local dy = row_height*(1 + math.floor((index - 1)/column_count))
   for _, group2 in ipairs(self._groups) do
     dy = dy + row_height
     if group == group2 then break end
@@ -243,6 +209,8 @@ end
 function PropertyTable:mousepressed(mx, my, button, isTouch)
   local group, index = self:_find_field_at(mx, my)
   self.active = true
+
+  if not group then return end
 
   if  group == self._active_group
   and index == self._active_index then
@@ -286,44 +254,46 @@ function PropertyTable:draw()
   local x, y, width, height = self:bounds()
   love.graphics.setColor(.25,.25,.25)
 
-  local split_width = self.split_pct*width
-
   rect_fill(x, y, width, height, fill_color)
   pleasure.push_region(x, y, width, height)
 
-  self:draw_head(width, height, split_width)
+  self:draw_head(width, height)
 
   local dy = row_height
 
   for _, group in ipairs(self._groups) do
     local remaining_height = height - dy
     if remaining_height <= 0 then break end
-    dy = dy + self:draw_group(group, width, remaining_height, split_width, dy)
+    dy = dy + self:draw_group(group, width, remaining_height, dy)
   end
   pleasure.pop_region()
 
-  vline(x + split_width, y, height, outline_color)
+  for i = 2, #self.column_names do
+    local dx = self:_column_dx_width(i)
+    vline(x + dx, y, height, outline_color)
+  end
+
   rect_line(x, y, width, height, outline_color)
 end
 
-function PropertyTable:draw_head(width, height, split_width)
+function PropertyTable:draw_head(width, height)
   rect_fill(0, 0, width, row_mid_y, rgb(192, 203, 220))
   rect_fill(0, 0, width, 1, rgb(205, 214, 227))
   rect_fill(0, row_mid_y, width, row_mid_y, rgb(180, 193, 213))
-  vline(split_width, 0, row_height, rgb(171, 181, 201))
   hline(0, row_height, width, rgb(171, 181, 201))
 
-  love.graphics.setColor(rgb(2, 25, 47))
-  pleasure.push_region(0, 0, split_width, row_height)
-  font_writer.print_aligned(font, self.keys_id, x_pad, row_mid_y, "left", "center")
-  pleasure.pop_region()
 
-  pleasure.push_region(split_width, 0, width - split_width, row_height)
-  font_writer.print_aligned(font, self.values_id, x_pad, row_mid_y, "left", "center")
-  pleasure.pop_region()
+  for i, name in ipairs(self.column_names) do
+    local dx, field_width = self:_column_dx_width(i)
+    love.graphics.setColor(rgb(2, 25, 47))
+    pleasure.push_region(dx, 0, field_width, row_height)
+    font_writer.print_aligned(font, name, x_pad, row_mid_y, "left", "center")
+    pleasure.pop_region()
+    if i > 1 then vline(dx, 0, row_height, rgb(171, 181, 201)) end
+  end
 end
 
-function PropertyTable:draw_group(group, width, height, split_width, dy)
+function PropertyTable:draw_group(group, width, height, dy)
   rect_fill(0, dy, width, row_height, outline_color)
 
   love.graphics.setColor(rgb(255, 255, 255))
@@ -332,25 +302,10 @@ function PropertyTable:draw_group(group, width, height, split_width, dy)
 
   if group.collapsed then return row_height end
 
-  local group_height = row_height
+  local is_active    = self._active_group == group
+  local active_index = self._active_index
 
-  local group_is_active = self._active_group == group
-  local active_index    = self._active_index
-
-  for key, value, row_index in group:rows() do
-    local key_is_active   = group_is_active and (row_index*2 - 1 == active_index)
-    local value_is_active = group_is_active and (row_index*2     == active_index)
-
-    self:draw_field(key, 0, group_height + dy, split_width, key_is_active)
-    self:draw_field(value, split_width, group_height + dy, width - split_width, value_is_active)
-    hline(0, dy + group_height, width, outline_color)
-
-    group_height = group_height + row_height
-    if group_height >= height then break end
-    hline(0, dy + group_height, width, outline_color)
-  end
-
-  return group_height
+  return group:draw(self, hline, outline_color, width, height, row_height, dy, is_active, active_index)
 end
 
 function PropertyTable:draw_field(field_text, x, y, width, is_active)
