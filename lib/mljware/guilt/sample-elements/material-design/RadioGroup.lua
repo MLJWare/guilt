@@ -7,7 +7,9 @@ local sub4 = sub3:match("(.-)%.[^%.]+$")
 local guilt                   = require (sub3)
 local try_invoke              = require (sub3..".pleasure.try").invoke
 
-local RadioGroup = guilt.template("RadioGroup")
+local namespace = guilt.namespace("material-design")
+
+local RadioGroup = namespace:template("RadioGroup")
 
 RadioGroup.preferred_width  = 0
 RadioGroup.preferred_height = 0
@@ -28,4 +30,4 @@ function RadioGroup:select(selected)
   end
 end
 
-guilt.finalize_template(RadioGroup)
+namespace:finalize_template(RadioGroup)

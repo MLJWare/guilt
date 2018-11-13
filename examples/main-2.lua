@@ -12,6 +12,9 @@ require "samples"
 
 local gui
 
+local nlayout  = guilt.namespace("layout")
+local material = guilt.namespace("material-design")
+
 function love.load(arg)
   local w, h = love.graphics.getDimensions()
 
@@ -32,7 +35,7 @@ function love.load(arg)
     end;
   }
 
-  layout = gui:new("GridLayout", {
+  layout = gui:new(nlayout.GridLayout, {
     column_count = 5;
     row_count    = 10;
     preferred_width  = w;
@@ -46,7 +49,7 @@ function love.load(arg)
 
   for j = 1, layout.row_count do
     for i = 1, layout.column_count do
-      layout:add_child(gui:new("Button", {
+      layout:add_child(gui:new(material.Button, {
         anchor_x = 0.5; align_x = 0.5;
         anchor_y = 0.5; align_y = 0.5;
         text = ("%d:%d"):format(i, j);

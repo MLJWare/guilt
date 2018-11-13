@@ -14,7 +14,9 @@ local pleasure                = require (sub3..".pleasure")
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
 
-local Button = guilt.template("Button"):needs{
+local namespace = guilt.namespace("material-design")
+
+local Button = namespace:template("Button"):needs{
   text   = pleasure.need.string;
 }
 
@@ -70,4 +72,4 @@ function Button:draw_pressed ()
   font_writer.print_aligned(roboto.button, self.text:upper(), cx, cy, "middle", "center")
 end
 
-guilt.finalize_template(Button)
+namespace:finalize_template(Button)

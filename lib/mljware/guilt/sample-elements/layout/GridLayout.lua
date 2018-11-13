@@ -17,7 +17,9 @@ local rgba                    = require (sub4..".color.rgba")
 local is_callable = pleasure.is.callable
 local try_invoke  = pleasure.try.invoke
 
-local GridLayout = guilt.template("GridLayout"):needs{
+local namespace = guilt.namespace("layout")
+
+local GridLayout = namespace:template("GridLayout"):needs{
   row_count    = pleasure.need.positive_integer;
   column_count = pleasure.need.positive_integer;
 }
@@ -116,4 +118,4 @@ GridLayout.textinput     = require "lib.mljware.guilt.delegate.textinput"
 GridLayout.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
 GridLayout.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
 
-guilt.finalize_template(GridLayout)
+namespace:finalize_template(GridLayout)

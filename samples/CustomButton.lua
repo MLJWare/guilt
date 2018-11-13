@@ -11,7 +11,9 @@ local rgba                    = require "lib.mljware.color.rgba"
 -- Example showing how to extend/override existing UI elements using the
 -- `Template:from` method.
 
-local StyleButton = guilt.template("StyleButton"):from("Button"):needs{
+local namespace = guilt.namespace("samples")
+
+local StyleButton = namespace:template("StyleButton"):from(guilt.namespace("material-design").Button):needs{
   color_normal  = pleasure.need.table;
   color_hover   = pleasure.need.table;
   color_pressed = pleasure.need.table;
@@ -50,4 +52,4 @@ function StyleButton:draw_pressed ()
   font_writer.print_aligned(roboto.button, self.text:upper(), cx, cy, "middle", "center")
 end
 
-guilt.finalize_template(StyleButton)
+namespace:finalize_template(StyleButton)

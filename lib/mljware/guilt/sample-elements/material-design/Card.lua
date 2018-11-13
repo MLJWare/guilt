@@ -17,7 +17,9 @@ local rgba                    = require (sub4..".color.rgba")
 
 local is_callable = pleasure.is.callable
 
-local Card = guilt.template("Card")
+local namespace = guilt.namespace("material-design")
+
+local Card = namespace:template("Card")
 
 Card.fill_color = rgb(255, 255, 255)
 
@@ -53,4 +55,4 @@ Card.textinput     = require (sub3..".delegate.textinput")
 Card.keypressed    = require (sub3..".delegate.keypressed")
 Card.keyreleased   = require (sub3..".delegate.keyreleased")
 
-guilt.finalize_template(Card)
+namespace:finalize_template(Card)

@@ -17,7 +17,9 @@ local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
 local clamp                   = require (sub4..".math.clamp")
 
-local ScrollH = guilt.template("ScrollH"):needs{
+local namespace = guilt.namespace("material-design")
+
+local ScrollH = namespace:template("ScrollH"):needs{
   preferred_width = pleasure.need.non_negative_number;
 }
 
@@ -86,4 +88,4 @@ function ScrollH:mousepressed (mx, my, button_index)
   end
 end
 
-guilt.finalize_template(ScrollH)
+namespace:finalize_template(ScrollH)

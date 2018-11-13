@@ -9,7 +9,9 @@ local EditableText            = require (sub2..".component.EditableText")
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
 
-local Textfield = guilt.template("Textfield"):needs{
+local namespace = guilt.namespace("material-design")
+
+local Textfield = namespace:template("Textfield"):needs{
   hint   = pleasure.need.string;
 }
 
@@ -67,4 +69,4 @@ function Textfield:mousedragged (mx, my, dx, dy, button1, button2)
   self._edit_:mousedragged(mx, my, dx, dy, button1, button2)
 end
 
-guilt.finalize_template(Textfield)
+namespace:finalize_template(Textfield)

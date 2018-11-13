@@ -88,7 +88,9 @@ do
   end
 end
 
-local PropertyTable = guilt.template("PropertyTable"):needs{
+local namespace = guilt.namespace("standard")
+
+local PropertyTable = namespace:template("PropertyTable"):needs{
   column_names = pleasure.need.table_of("string");
 }
 
@@ -323,4 +325,4 @@ function PropertyTable:draw_field(field_text, x, y, width, is_active)
   pleasure.pop_region()
 end
 
-guilt.finalize_template(PropertyTable)
+namespace:finalize_template(PropertyTable)

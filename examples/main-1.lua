@@ -29,14 +29,18 @@ function love.load(arg)
     end;
   }
 
-  local textfield = gui:new("Textfield", {
+  local material = guilt.namespace("material-design")
+  local layout   = guilt.namespace("layout")
+  local samples  = guilt.namespace("samples")
+
+  local textfield = gui:new(material.Textfield, {
     anchor_x = 0.5;
     align_x  = 0.5;
     anchor_y = 0.7;
     align_y  = 0.5;
     hint   = "Sample hint";
   });
-  local calc_button = gui:new("StyleButton", {
+  local calc_button = gui:new(samples.StyleButton, {
     color_normal  = rgb(26, 129, 27);
     color_hover   = rgb(23, 115, 24);
     color_pressed = rgb(19, 69, 19);
@@ -52,7 +56,7 @@ function love.load(arg)
        end
     end
   });
-  local card = gui:new("Card", {
+  local card = gui:new(material.Card, {
     anchor_x = 0.5;
     align_x = 0.5;
     anchor_y = 0.4;
@@ -61,7 +65,7 @@ function love.load(arg)
     preferred_height = 400;
   })
 
-  local scale_buttons = gui:new("GridLayout", {
+  local scale_buttons = gui:new(layout.GridLayout, {
     column_count = 2;
     row_count    = 1;
     preferred_width  = 250;
@@ -72,7 +76,7 @@ function love.load(arg)
     align_y = 0.5;
   })
 
-  scale_buttons:add_child(gui:new("Button", {
+  scale_buttons:add_child(gui:new(material.Button, {
     text     = "Scale +";
     anchor_x = 0.5;
     align_x  = 0.5;
@@ -85,7 +89,7 @@ function love.load(arg)
     end;
   }), 1, 1)
 
-  scale_buttons:add_child(gui:new("Button", {
+  scale_buttons:add_child(gui:new(material.Button, {
     text     = "Scale -";
     anchor_x = 0.5;
     align_x  = 0.5;
@@ -99,7 +103,7 @@ function love.load(arg)
   }), 2, 1)
 
   card:add_children(
-    gui:new("Label", {
+    gui:new(material.Label, {
       anchor_x = 0.5;
       align_x = 0.5;
       anchor_y = 0.1;
@@ -107,7 +111,7 @@ function love.load(arg)
       text   = "GUI sample (based on Material Design)";
       text_color = rgb(18, 38, 121);
     }),
-    gui:new("Button", {
+    gui:new(material.Button, {
       x = -10;
       anchor_x = 0.5;
       align_x = 1;
@@ -121,7 +125,7 @@ function love.load(arg)
         textfield.texttype = "password"
       end;
     }),
-    gui:new("Button", {
+    gui:new(material.Button, {
       x = 10;
       anchor_x = 0.5;
       align_x = 0;
@@ -135,7 +139,7 @@ function love.load(arg)
       end;
     }),
     scale_buttons,
-    gui:new("SliderH", {
+    gui:new(material.SliderH, {
       anchor_x = 0.5;
       align_x  = 0.5;
       anchor_y = 0.5;
@@ -152,7 +156,7 @@ function love.load(arg)
 
   gui:add_children(
     card,
-    gui:new("Button", {
+    gui:new(material.Button, {
       anchor_x = 0.5;
       align_x  = 0.5;
       anchor_y = 0.9;

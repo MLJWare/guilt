@@ -14,6 +14,8 @@ require "samples"
 local gui, card, textfield, scroll_h, scroll_v
 local square
 
+local material = guilt.namespace("material-design")
+
 function love.load(arg)
   local w, h = love.graphics.getDimensions()
 
@@ -33,7 +35,7 @@ function love.load(arg)
     end;
   }
 
-  card = gui:new("Card", {
+  card = gui:new(material.Card, {
     anchor_x = 0.5;
     align_x = 0.5;
     anchor_y = 0.4;
@@ -42,7 +44,7 @@ function love.load(arg)
     preferred_height = 400;
   })
 
-  textfield = gui:new("Textfield", {
+  textfield = gui:new(material.Textfield, {
     preferred_width = 200;
     anchor_x = 0.5;
     align_x  = 0.5;
@@ -50,7 +52,7 @@ function love.load(arg)
     hint = "";
   })
 
-  scroll_h = gui:new("ScrollH", {
+  scroll_h = gui:new(material.ScrollH, {
     x = 50;
     y = 260;
     preferred_width = 200;
@@ -63,7 +65,7 @@ function love.load(arg)
   })
   scroll_h:on_change()
 
-  scroll_v = gui:new("ScrollV", {
+  scroll_v = gui:new(material.ScrollV, {
     x = 260;
     y = 50;
     preferred_height = 200;

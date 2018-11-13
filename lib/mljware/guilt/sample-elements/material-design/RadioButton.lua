@@ -16,7 +16,9 @@ local pleasure                = require (sub3..".pleasure")
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
 
-local RadioButton = guilt.template("RadioButton"):needs{
+local namespace = guilt.namespace("material-design")
+
+local RadioButton = namespace:template("RadioButton"):needs{
   group = pleasure.need.kind("RadioGroup");
 }
 
@@ -66,4 +68,4 @@ function RadioButton:select()
   self.group:select(self)
 end
 
-guilt.finalize_template(RadioButton)
+namespace:finalize_template(RadioButton)

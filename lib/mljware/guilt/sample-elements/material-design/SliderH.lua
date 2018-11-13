@@ -16,7 +16,9 @@ local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
 local clamp                   = require (sub4..".math.clamp")
 
-local SliderH = guilt.template("SliderH"):needs{
+local namespace = guilt.namespace("material-design")
+
+local SliderH = namespace:template("SliderH"):needs{
   progress = pleasure.need.non_negative_number;
 }
 
@@ -90,4 +92,4 @@ function SliderH:mousepressed (mx, my, button_index)
   end
 end
 
-guilt.finalize_template(SliderH)
+namespace:finalize_template(SliderH)

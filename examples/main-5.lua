@@ -13,6 +13,9 @@ require "samples"
 
 local gui
 
+local material = guilt.namespace("material-design")
+local standard = guilt.namespace("standard")
+
 function love.load(arg)
   local w, h = love.graphics.getDimensions()
 
@@ -30,7 +33,7 @@ function love.load(arg)
     end;
   }
 
-  local card = gui:new("Card", {
+  local card = gui:new(material.Card, {
     anchor_x = 0.5;
     align_x = 0.5;
     anchor_y = 0.4;
@@ -40,7 +43,7 @@ function love.load(arg)
     fill_color = rgb(99, 227, 246);
   })
 
-  local properties = gui:new("PropertyTable", {
+  local properties = gui:new(standard.PropertyTable, {
     column_names = {"Property", "Value", "Kind"};
     anchor_x = 0.5;
     align_x = 0.5;

@@ -15,7 +15,9 @@ local pleasure                = require (sub3..".pleasure")
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
 
-local Label = guilt.template("Label"):needs{
+local namespace = guilt.namespace("material-design")
+
+local Label = namespace:template("Label"):needs{
   text   = pleasure.need.string;
 }
 
@@ -33,4 +35,4 @@ function Label:draw ()
   font_writer.print_aligned(self.font, self.text, cx, cy, "middle", "center")
 end
 
-guilt.finalize_template(Label)
+namespace:finalize_template(Label)

@@ -126,11 +126,35 @@ function guilt.gui(props)
   return setmetatable(props, GUI)
 end
 
-function GUI:new(template_id, props)
-  insist(is.string(template_id), "Template id must be a string.")
-  local template = _templates[template_id]
-  insist(is.table(template), "No template named %q exist.", template_id)
-  insist(getmetatable(template) ~= Template, "Template %q must be finalized before use.", template_id)
+local _namespaces = {}
+
+local Namespace = {
+  __immutable = true;
+}
+function Namespace.__index(self, key)
+  return rawget(Namespace, key)
+      or rawget(self, "_templates")[key]
+end
+
+function guilt.namespace(namespace_id)
+  local namespace = _namespaces[namespace_id]
+  if not namespace then
+    namespace = setmetatable({ 
+      _id_       = namespace_id;
+      _templates = {};
+      _needs     = {};
+     }, Namespace)
+    _namespaces[namespace_id] = namespace
+  end
+  return namespace
+end
+
+function GUI:new(template, props)
+  -- TODO enable argument checking
+  --insist(is.template(template), "Template id must be a valid guilt Template.")
+  --local template = _templates[template_id]
+  --insist(is.table(template), "No template named %q exist.", template_id)
+  --insist(getmetatable(template) ~= Template, "Template %q must be finalized before use.", template_id)
 
   local needs = _needs[template_id]
   if needs then
@@ -179,19 +203,21 @@ GUI.textinput     = require "lib.mljware.guilt.delegate.textinput"
 GUI.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
 GUI.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
 
-function guilt.template(template_id)
+function Namespace:template(template_id)
   insist(is.string(template_id), "Template id must be a string.")
 
-  local template = setmetatable({}, Template)
+  local template = setmetatable({
+    _namespace_ = self;
+  }, Template)
 
-  _templates[template_id] = template
-  _templates[template] = template_id
+  self._templates[template_id] = template
+  self._templates[template] = template_id
 
   return template
 end
 
 -- TODO more code to finalize template?
-function guilt.finalize_template(template)
+function Namespace:finalize_template(template)
   insist(is.table(template) and getmetatable(template) == Template, "Template provided must be an actual guilt Template.")
   setmetatable(template, nil)
   insist(template.bounds == nil, "Template must not override internal `bounds` method.")
@@ -244,12 +270,13 @@ function guilt.finalize_template(template)
   template.size         = element_size
   template.__index      = template
 
-  template._kind_ = _templates[template]
+  template._kind_ = self._templates[template]
 end
 
-function guilt.template_try_call(template_id, method_id, ...)
+-- FIXME broken
+function Namespace:template_try_call(template_id, method_id, ...)
   insist(is.string(template_id), "First argument to `guilt.template_invoke` must be a string referencing a previously finalized Template.")
-  local template = _templates[template_id]
+  local template = self._templates[template_id]
   insist(is.string(method_id), "Second argument to `guilt.template_invoke` must be a string referencing a method on the template.")
   local method = template[method_id]
   if method and is.callable(method) then
@@ -257,11 +284,12 @@ function guilt.template_try_call(template_id, method_id, ...)
   end
 end
 
-function Template:from(parent_id)
-  insist(is.string(parent_id), "Argument to `Template:from` must be a string referencing a previously finalized Template.")
-  local parent = _templates[parent_id]
-  insist(is.table(parent), "No template named %q exist.", parent_id)
-  insist(getmetatable(parent) ~= Template, "Template %q must be finalized before it can be used in `Template:from`.", parent_id)
+function Template:from(parent)
+  -- TODO reneable argument checking
+  --insist(is.string(parent_id), "Argument to `Template:from` must be a string referencing a previously finalized Template.")
+  --local parent = self._namespace_._templates[parent_id]
+  --insist(is.table(parent), "No template named %q exist.", parent_id)
+  --insist(getmetatable(parent) ~= Template, "Template %q must be finalized before it can be used in `Template:from`.", parent_id)
 
   for k, v in pairs(parent) do
     if is.string(k)
@@ -272,10 +300,9 @@ function Template:from(parent_id)
     end
   end
 
-  local parent_needs = _needs[parent_id]
+  local parent_needs = self._namespace_._needs[parent]
   if parent_needs then
-    local id    = _templates[self]
-    local needs = ensure(_needs, id)
+    local needs = ensure(_needs, self)
     for k, v in pairs(parent_needs) do
       if not needs[k] then
         needs[k] = v
@@ -294,11 +321,10 @@ function Template:needs(props)
     insist(is.callable(enforcer), "Enforcer of need `%s` must callable.", need)
   end
 
-  local name = _templates[self]
-
-  local needs = _needs[name]
+  local _needs = self._namespace_._needs
+  local needs = _needs[self]
   if not needs then
-    _needs[name] = props
+    _needs[self] = props
   else
     for k, v in pairs(props) do
       if not needs[k] then
