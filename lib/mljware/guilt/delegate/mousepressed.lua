@@ -32,6 +32,7 @@ return function (self, mx, my, button, isTouch)
     and child:contains(mx, my) then
       gui_tag_bag[child] = true
       child[press_tag] = true
+      child.pressed    = true
       if  not_found
       and is_callable(child.mousepressed) then
         child:mousepressed(mx, my, button, isTouch)

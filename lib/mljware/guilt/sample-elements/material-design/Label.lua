@@ -22,6 +22,7 @@ local Label = namespace:template("Label"):needs{
 }
 
 Label.font = roboto.body1
+Label.text_color = rgb(255, 255, 255)
 
 function Label:init()
   self.preferred_width  = math.max(self.preferred_width or 0, self.font:getWidth(self.text))
@@ -31,7 +32,7 @@ end
 function Label:draw ()
   local x, y, width, height = self:bounds()
   local cx, cy = x + width/2, y + height/2
-  love.graphics.setColor(self.text_color or  rgb(255, 255, 255))
+  love.graphics.setColor(self.text_color)
   font_writer.print_aligned(self.font, self.text, cx, cy, "middle", "center")
 end
 

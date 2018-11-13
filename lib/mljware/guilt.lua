@@ -41,8 +41,14 @@ local function element_bounds(self)
   local region_x, region_y, region_width, region_height = parent:region_of(self)
   local x, y, width, height = self.x, self.y, self:size()
 
-  return x + (self.anchor_x or 0)*region_width  - (self.align_x or 0)*width
-       , y + (self.anchor_y or 0)*region_height - (self.align_y or 0)*height
+  local anchor_x = self.anchor_x or 0
+  local anchor_y = self.anchor_y or 0
+
+  local align_x  = self.align_x or 0
+  local align_y  = self.align_y or 0
+
+  return x + anchor_x*region_width  - align_x*width
+       , y + anchor_y*region_height - align_y*height
        , width
        , height
 end
@@ -65,7 +71,7 @@ local function element_reverse_children(self)
 end
 
 local function element_region_of(self, child)
-  local _, _, width, height = self:bounds()
+  local width, height = self:size()
   return 0, 0, width, height
 end
 
@@ -140,7 +146,7 @@ function guilt.namespace(namespace_id)
   local namespace = _namespaces[namespace_id]
   if not namespace then
     namespace = setmetatable({ 
-      _id_       = namespace_id;
+      _id        = namespace_id;
       _templates = {};
       _needs     = {};
      }, Namespace)
@@ -223,10 +229,10 @@ function Namespace:finalize_template(template)
   insist(template.bounds == nil, "Template must not override internal `bounds` method.")
   insist(template.size   == nil, "Template must not override internal `size` method.")
 
-  template.anchor_x = template.anchor_x or 0
-  template.anchor_y = template.anchor_y or 0
-  template.align_x  = template.align_x  or 0
-  template.align_y  = template.align_y  or 0
+  --template.anchor_x = template.anchor_x or 0
+  --template.anchor_y = template.anchor_y or 0
+  --template.align_x  = template.align_x  or 0
+  --template.align_y  = template.align_y  or 0
   template.x        = template.x        or 0
   template.y        = template.y        or 0
 

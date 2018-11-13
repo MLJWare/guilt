@@ -40,7 +40,7 @@ function love.load(arg)
     align_y = 0.5;
     preferred_width  = 300;
     preferred_height = 400;
-    fill_color = rgb(99, 227, 246);
+    back_color = rgb(99, 227, 246);
   })
 
   local properties = gui:new(standard.PropertyTable, {

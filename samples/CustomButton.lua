@@ -12,8 +12,9 @@ local rgba                    = require "lib.mljware.color.rgba"
 -- `Template:from` method.
 
 local namespace = guilt.namespace("samples")
+local material  = guilt.namespace("material-design")
 
-local StyleButton = namespace:template("StyleButton"):from(guilt.namespace("material-design").Button):needs{
+local StyleButton = namespace:template("StyleButton"):from(material.Button):needs{
   color_normal  = pleasure.need.table;
   color_hover   = pleasure.need.table;
   color_pressed = pleasure.need.table;

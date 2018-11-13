@@ -18,7 +18,8 @@ return function (self, mx, my, button, isTouch)
   mx, my = mx/scale, my/scale
 
   local gui = self._guilt_gui_
-  local gui_tag_bag = ensure(gui.tags, press_tag)
+  local gui_tags = gui.tags
+  local gui_tag_bag = ensure(gui_tags, press_tag)
 
   local not_found = true
   for _, child, region_x, region_y, region_width, region_height in self:children() do
@@ -41,9 +42,18 @@ return function (self, mx, my, button, isTouch)
   end
 
   if gui == self then
+    local pressed1 = ensure(gui_tags, "pressed1")
+    local pressed2 = ensure(gui_tags, "pressed2")
+    local pressed3 = ensure(gui_tags, "pressed3")
+
     for child in pairs(gui_tag_bag) do
       child[press_tag]   = nil
       gui_tag_bag[child] = nil
+
+      child.pressed = pressed1[child] 
+                   or pressed2[child]
+                   or pressed3[child] 
+                   or nil
     end
   end
 end

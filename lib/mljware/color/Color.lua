@@ -30,7 +30,7 @@ function Color.from_rgba_pct(r, g, b, a)
   g = g <= 0 and 0 or g >= 1 and 1 or g
   b = b <= 0 and 0 or b >= 1 and 1 or b
   a = a <= 0 and 0 or a >= 1 and 1 or a
-  local id = string.format("%A:%A:%A:%A", r, g, b, a)
+  local id = string.format("#%02X%02X%02X%02X", r*255, g*255, b*255, a*255)
   if not _cache[id] then
     _cache[id] = new_Color(r,g,b,a,rgb2hsv(r,g,b))
   end
@@ -39,7 +39,7 @@ end
 
 function Color.from_hsva(h, s, v, a)
   local r, g, b = hsv2rgb(h,s,v)
-  local id = string.format("%A:%A:%A:%A", r, g, b, a)
+  local id = string.format("#%02X%02X%02X%02X", r*255, g*255, b*255, a*255)
   if not _cache[id] then
     _cache[id] = new_Color(r,g,b,a,h,s,v)
   end
