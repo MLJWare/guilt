@@ -21,6 +21,7 @@ return function (self, mx, my, dx, dy)
   local gui = self._guilt_gui_
   local gui_pressed1_bag = gui.tags.pressed1
   local gui_pressed2_bag = gui.tags.pressed2
+  local gui_hovered_bag  = ensure(gui.tags, "hovered")
 
   local not_found = true
   for _, child, region_x, region_y, region_width, region_height in self:children() do
@@ -29,12 +30,26 @@ return function (self, mx, my, dx, dy)
     if  not_found
     and mx >= 0 and (region_width or math.huge) > mx
     and my >= 0 and (region_height or math.huge) > my
-    and child:contains(mx, my)
-    and is_callable(child.mousemoved) then
-      child:mousemoved(mx, my, dx, dy)
-      not_found = false
+    and child:contains(mx, my) then
+      gui_hovered_bag[child] = true
+      if  not child.hovered 
+      and is_callable(child.mouseenter) then 
+        child:mouseenter(mx, my, dx, dy)
+      end
+      child.hovered = true
+      if is_callable(child.mousemoved) then
+        child:mousemoved(mx, my, dx, dy)
+        not_found = false
+      end
+    else
+      gui_hovered_bag[child] = nil
+      if  child.hovered 
+      and is_callable(child.mouseleave) then 
+        child:mouseleave(mx, my, dx, dy)
+      end
+      child.hovered = nil
     end
-
+  
     local pressed1 = gui_pressed1_bag and gui_pressed1_bag[child] or false
     local pressed2 = gui_pressed2_bag and gui_pressed2_bag[child] or false
     if pressed1 or pressed2 then

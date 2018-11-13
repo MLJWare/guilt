@@ -27,10 +27,11 @@ function Button:init()
   self.preferred_height = height
 end
 
-
 function Button:draw ()
   if self.pressed1 then
     self:draw_pressed()
+  elseif self.hovered then 
+    self:draw_hover()
   else
     self:draw_normal()
   end
@@ -53,9 +54,9 @@ function Button:draw_hover ()
   local cx, cy = x + width/2, y + height/2
 
   -- drop shadow
-  smooth_rectangle(x, y+1, width, height, 2, rgba(0,0,0,0.62))
+  smooth_rectangle(x, y, width, height, 2, rgba(0,0,0,0.62))
   -- button
-  smooth_rectangle(x, y, width, height, 2, rgb(42, 147, 247))
+  smooth_rectangle(x, y-1, width, height, 2, rgb(42, 147, 247))
   love.graphics.setColor(1, 1, 1)
   font_writer.print_aligned(roboto.button, self.text:upper(), cx, cy, "middle", "center")
 end

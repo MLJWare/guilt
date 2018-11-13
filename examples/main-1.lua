@@ -38,6 +38,7 @@ function love.load(arg)
   });
   local calc_button = gui:new("StyleButton", {
     color_normal  = rgb(26, 129, 27);
+    color_hover   = rgb(23, 115, 24);
     color_pressed = rgb(19, 69, 19);
     anchor_x = 0.5;
     align_x  = 0.5;
