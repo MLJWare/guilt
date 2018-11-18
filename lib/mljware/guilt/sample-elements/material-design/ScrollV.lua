@@ -9,6 +9,7 @@ local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
+local NOP                     = require (sub3..".pleasure.NOP")
 
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
@@ -46,11 +47,11 @@ function ScrollV:draw()
   self:draw_knob(x, y, width, height, knob_y, knob_height)
 end
 
-function ScrollV:draw_bar(x, y, width, height, _, _)
+function ScrollV.draw_bar(_, x, y, width, height, _, _)
   smooth_line(x + width/2, y, x + width/2, y + height, 1, rgb(6, 138, 79))
 end
 
-function ScrollV:draw_knob(x, _, width, _, knob_y, knob_height)
+function ScrollV.draw_knob(_, x, _, width, _, knob_y, knob_height)
   local r = width/2
   smooth_rectangle(x, knob_y+2, width, knob_height - 2, r, rgba(0, 0, 0, 0.5))
   smooth_rectangle(x, knob_y+1, width, knob_height - 2, r, rgb(13, 213, 109))
@@ -82,5 +83,8 @@ function ScrollV:mousepressed (_, my, button_index)
     self:set_progress((my - y - knob_height/2)/(height - knob_height))
   end
 end
+
+ScrollV.mousereleased = NOP
+ScrollV.mouseclicked  = NOP
 
 namespace:finalize_template(ScrollV)

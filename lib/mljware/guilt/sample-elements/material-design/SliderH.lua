@@ -9,6 +9,7 @@ local smooth_circle           = require (sub2..".utils.smooth_circle")
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
+local NOP                     = require (sub3..".pleasure.NOP")
 
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
@@ -81,13 +82,15 @@ function SliderH:mousepressed (mx, _, button_index)
   local x2, knob_x = x1 + width, x1 + width*old_progress
 
   local knob_radius = self.knob_radius
-  if math.abs(knob_x - mx) <= knob_radius then
-    -- clicked on the knob, don't update `progress` value
-  elseif mx >= x1 - knob_radius and mx <= x2 + knob_radius then
+  if math.abs(knob_x - mx) > knob_radius -- didn't click on the knob
+  and mx >= x1 - knob_radius and mx <= x2 + knob_radius then
     -- clicked directly on the line, update `progress` value
     self:set_progress((mx - x1)/width)
     pleasure.try.invoke(self, "on_change", old_progress)
   end
 end
+
+SliderH.mousereleased = NOP
+SliderH.mouseclicked  = NOP
 
 namespace:finalize_template(SliderH)

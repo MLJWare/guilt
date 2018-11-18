@@ -9,6 +9,7 @@ local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
+local NOP                     = require (sub3..".pleasure.NOP")
 
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
@@ -46,11 +47,11 @@ function ScrollH:draw()
   self:draw_knob(x, y, width, height, knob_x, knob_width)
 end
 
-function ScrollH:draw_bar(x, y, width, height, _, _)
+function ScrollH.draw_bar(_, x, y, width, height, _, _)
   smooth_line(x, y + height/2, x + width, y + height/2, 1, rgb(6, 138, 79))
 end
 
-function ScrollH:draw_knob(_, y, _, height, knob_x, knob_width)
+function ScrollH.draw_knob(_, _, y, _, height, knob_x, knob_width)
   local h = height - 2
   local r = h/2
   smooth_rectangle(knob_x, y+2, knob_width, h, r, rgba(0, 0, 0, 0.5))
@@ -83,5 +84,8 @@ function ScrollH:mousepressed (mx, _, button_index)
     self:set_progress((mx - x - knob_width/2)/(width - knob_width))
   end
 end
+
+ScrollH.mousereleased = NOP
+ScrollH.mouseclicked  = NOP
 
 namespace:finalize_template(ScrollH)

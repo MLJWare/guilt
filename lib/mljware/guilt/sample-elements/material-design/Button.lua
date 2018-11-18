@@ -11,6 +11,8 @@ local font_writer             = require (sub2..".utils.font_writer")
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
+local NOP                     = require (sub3..".pleasure.NOP")
+
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
 
@@ -86,5 +88,9 @@ function Button:draw_pressed ()
   love.graphics.setColor(text_color)
   font_writer.print_aligned(roboto.button, self.text:upper(), cx, cy, "middle", "center")
 end
+
+Button.mousepressed  = NOP
+Button.mousereleased = NOP
+Button.mouseclicked  = NOP
 
 namespace:finalize_template(Button)

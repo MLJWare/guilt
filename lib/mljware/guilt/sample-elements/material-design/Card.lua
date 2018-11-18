@@ -8,6 +8,7 @@ local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
+local NOP                     = require (sub3..".pleasure.NOP")
 
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
@@ -49,5 +50,6 @@ Card.mousereleased = require (sub3..".delegate.mousereleased")
 Card.textinput     = require (sub3..".delegate.textinput")
 Card.keypressed    = require (sub3..".delegate.keypressed")
 Card.keyreleased   = require (sub3..".delegate.keyreleased")
+Card.mouseclicked  = NOP
 
 namespace:finalize_template(Card)

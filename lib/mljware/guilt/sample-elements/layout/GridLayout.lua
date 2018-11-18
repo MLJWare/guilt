@@ -34,7 +34,7 @@ function GridLayout:add_child(child, i, j)
   child._parent = self
 end
 
-function GridLayout:add_children()
+function GridLayout.add_children()
   error ("Method `add_children` not allowed with GridLayout.")
 end
 
@@ -106,5 +106,6 @@ GridLayout.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
 GridLayout.textinput     = require "lib.mljware.guilt.delegate.textinput"
 GridLayout.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
 GridLayout.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
+GridLayout.mouseclicked  = function () end
 
 namespace:finalize_template(GridLayout)

@@ -24,18 +24,18 @@ return function (self, mx, my, button, isTouch)
 
   local not_found = true
   for _, child, region_x, region_y, region_width, region_height in self:children() do
-    local mx, my = mx - (region_x or 0), my - (region_y or 0)
+    local child_mx, child_my = mx - (region_x or 0), my - (region_y or 0)
     -- TODO ensure [mx, my] contained in region
     child.active = nil
-    if mx >= 0 and (region_width or math.huge) > mx
-    and my >= 0 and (region_height or math.huge) > my
-    and child:contains(mx, my) then
+    if  child_mx >= 0 and (region_width or math.huge) > child_mx
+    and child_my >= 0 and (region_height or math.huge) > child_my
+    and child:contains(child_mx, child_my) then
       gui_tag_bag[child] = true
       child[press_tag] = true
       child.pressed    = true
       if  not_found
       and is_callable(child.mousepressed) then
-        child:mousepressed(mx, my, button, isTouch)
+        child:mousepressed(child_mx, child_my, button, isTouch)
         not_found = false
       end
     end

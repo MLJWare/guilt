@@ -2,10 +2,10 @@ local subsubpath = (...):match("(.-)[^%.]+%.[^%.]+$")
 
 local ensure = require (subsubpath.."pleasure.ensure")
 
-local is_callable, try_invoke
+local is_callable
 do
   local pleasure = require (subsubpath.."pleasure")
-  is_callable, try_invoke = pleasure.is.callable, pleasure.try.invoke
+  is_callable = pleasure.is.callable
 end
 
 return function (self, mx, my, button, isTouch)
@@ -21,24 +21,27 @@ return function (self, mx, my, button, isTouch)
   local gui_tags = gui.tags
   local gui_tag_bag = ensure(gui_tags, press_tag)
 
-  local not_found = true
+  local no_release = true
+  local no_click   = true
   for _, child, region_x, region_y, region_width, region_height in self:children() do
-    local mx, my = mx - (region_x or 0), my - (region_y or 0)
+    local child_mx, child_my = mx - (region_x or 0), my - (region_y or 0)
     -- TODO ensure [mx, my] contained in region
-    if  not_found
-    and mx >= 0 and (region_width or math.huge) > mx
-    and my >= 0 and (region_height or math.huge) > my
-    and child:contains(mx, my)
-    and is_callable(child.mousereleased) then
-      child:mousereleased(mx, my, button, isTouch)
-      not_found = false
-    end
+    if  child_mx >= 0 and (region_width or math.huge) >child_mx
+    and child_my >= 0 and (region_height or math.huge) > child_my
+    and child:contains(child_mx, child_my) then
 
-    if gui_tag_bag[child] then
-      if child:contains(mx, my) then
-        try_invoke(child, "mouseclicked", mx, my, button)
+      if no_release and is_callable(child.mousereleased) then
+        child:mousereleased(child_mx, child_my, button, isTouch)
+        no_release = false
+      end
+
+      if no_click and gui_tag_bag[child] and is_callable(child.mouseclicked) then
+        child:mouseclicked(mx, my, button)
+        no_click = false
       end
     end
+
+    --if not (no_release or no_click) then break end
   end
 
   if gui == self then

@@ -7,6 +7,7 @@ local EditableText            = require (sub2..".component.EditableText")
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
+local NOP                     = require (sub3..".pleasure.NOP")
 
 local namespace = guilt.namespace("material-design")
 
@@ -67,5 +68,7 @@ end
 function Textfield:mousedragged (mx, my, dx, dy, button1, button2)
   self._edit_:mousedragged(mx, my, dx, dy, button1, button2)
 end
+
+Textfield.mouseclicked  = NOP
 
 namespace:finalize_template(Textfield)

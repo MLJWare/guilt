@@ -9,6 +9,7 @@ local smooth_rectangle_outline= require (sub2..".utils.smooth_rectangle_outline"
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
+local NOP                     = require (sub3..".pleasure.NOP")
 
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
@@ -52,6 +53,9 @@ end
 function RadioButton:mousepressed()
   self:select()
 end
+
+RadioButton.mousereleased = NOP
+RadioButton.mouseclicked  = NOP
 
 function RadioButton:select()
   self.group:select(self)
