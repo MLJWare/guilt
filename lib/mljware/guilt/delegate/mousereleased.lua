@@ -11,7 +11,7 @@ end
 return function (self, mx, my, button, isTouch)
   local press_tag = "pressed"..button
 
-  local x, y, width, height = self:bounds()
+  local x, y = self:bounds()
   mx, my = mx - x, my - y
 
   local scale = self.render_scale or 1
@@ -50,9 +50,9 @@ return function (self, mx, my, button, isTouch)
       child[press_tag]   = nil
       gui_tag_bag[child] = nil
 
-      child.pressed = pressed1[child] 
+      child.pressed = pressed1[child]
                    or pressed2[child]
-                   or pressed3[child] 
+                   or pressed3[child]
                    or nil
     end
   end

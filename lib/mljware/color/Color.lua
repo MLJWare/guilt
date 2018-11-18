@@ -7,10 +7,10 @@ local _cache = {}
 local Color = {
   __tostring = function (self)
     local r, g, b, a = unpack(self)
-    local r = r*255
-    local g = g*255
-    local b = b*255
-    local a = a*255
+    r = r*255
+    g = g*255
+    b = b*255
+    a = a*255
     return string.format("#%02X%02X%02X%02X", r, g, b, a)
   end;
 }

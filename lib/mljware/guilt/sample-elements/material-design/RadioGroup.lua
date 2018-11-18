@@ -2,7 +2,6 @@ local path = (...)
 local sub1 = path:match("(.-)%.[^%.]+$")
 local sub2 = sub1:match("(.-)%.[^%.]+$")
 local sub3 = sub2:match("(.-)%.[^%.]+$")
-local sub4 = sub3:match("(.-)%.[^%.]+$")
 
 local guilt                   = require (sub3)
 local try_invoke              = require (sub3..".pleasure.try").invoke

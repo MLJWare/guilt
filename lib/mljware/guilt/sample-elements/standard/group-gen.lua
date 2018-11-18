@@ -47,7 +47,7 @@ function Group:insert_row(]], build_arg_list("arg", element_count, "", "opt_row_
   local data = self._data
   if opt_row_index then
     local index = ]], element_count, [[*clamp(opt_row_index - 1, 0, #data)
-]], function (builder)
+]], function ()
       for i = 1, element_count do
         yield(build_code([[
     table.insert(self._data, index + ]], i, [[, tostring(arg]], i, [[ or "") or "")

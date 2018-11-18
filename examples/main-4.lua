@@ -4,7 +4,6 @@ local guilt                   = require "lib.mljware.guilt"
 local pleasure                = require "lib.mljware.guilt.pleasure"
 local rgb                     = require "lib.mljware.color.rgb"
 local rgba                    = require "lib.mljware.color.rgba"
-local smooth_rectangle        = require "lib.mljware.guilt.sample-elements.utils.smooth_rectangle"
 
 local try_invoke  = pleasure.try.invoke
 
@@ -12,17 +11,14 @@ require "lib.mljware.guilt.sample-elements.material-design"
 require "lib.mljware.guilt.sample-elements.layout"
 require "samples"
 
-local gui, card, textfield, scroll_h, scroll_v
-local square
+local gui, card, info
 
 local material = guilt.namespace("material-design")
 
-function love.load(arg)
+function love.load()
   local w, h = love.graphics.getDimensions()
 
   love.keyboard.setKeyRepeat(true)
-
-  square = {x = 0, y = 0}
 
   gui = guilt.gui{
     render_scale = 1;
@@ -54,7 +50,7 @@ function love.load(arg)
   })
 
   local group = gui:new(material.RadioGroup, {
-    on_change = function (self, selected, previous_selected)
+    on_change = function (_, selected)
       local element = card:child_at_index(selected.id*2)
       info.text = ("You selected: %q"):format(element.text)
     end
@@ -81,7 +77,7 @@ function love.load(arg)
   )
 end
 
-for i, callback in ipairs{
+for _, callback in ipairs{
   "keypressed";
   "keyreleased";
   "mousemoved";
@@ -91,7 +87,6 @@ for i, callback in ipairs{
   "textinput";
 } do
   love[callback] = function (...)
-    local width, height = love.graphics.getDimensions()
     try_invoke(gui, callback, ...)
   end
 end

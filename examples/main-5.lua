@@ -16,7 +16,7 @@ local gui
 local material = guilt.namespace("material-design")
 local standard = guilt.namespace("standard")
 
-function love.load(arg)
+function love.load()
   local w, h = love.graphics.getDimensions()
 
   love.keyboard.setKeyRepeat(true)
@@ -76,7 +76,7 @@ function love.load(arg)
   gui:add_child(card)
 end
 
-for i, callback in ipairs{
+for _, callback in ipairs{
   "keypressed";
   "keyreleased";
   "mousemoved";
@@ -86,7 +86,6 @@ for i, callback in ipairs{
   "textinput";
 } do
   love[callback] = function (...)
-    local width, height = love.graphics.getDimensions()
     try_invoke(gui, callback, ...)
   end
 end

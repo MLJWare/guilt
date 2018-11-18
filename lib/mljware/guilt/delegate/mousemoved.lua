@@ -11,7 +11,7 @@ end
 return function (self, mx, my, dx, dy)
   --TODO mouse enter/exit
 
-  local x, y, width, height = self:bounds()
+  local x, y = self:bounds()
   mx, my = mx - x, my - y
 
   local scale = self.render_scale or 1
@@ -32,8 +32,8 @@ return function (self, mx, my, dx, dy)
     and my >= 0 and (region_height or math.huge) > my
     and child:contains(mx, my) then
       gui_hovered_bag[child] = true
-      if  not child.hovered 
-      and is_callable(child.mouseenter) then 
+      if  not child.hovered
+      and is_callable(child.mouseenter) then
         child:mouseenter(mx, my, dx, dy)
       end
       child.hovered = true
@@ -43,13 +43,13 @@ return function (self, mx, my, dx, dy)
       end
     else
       gui_hovered_bag[child] = nil
-      if  child.hovered 
-      and is_callable(child.mouseleave) then 
+      if  child.hovered
+      and is_callable(child.mouseleave) then
         child:mouseleave(mx, my, dx, dy)
       end
       child.hovered = nil
     end
-  
+
     local pressed1 = gui_pressed1_bag and gui_pressed1_bag[child] or false
     local pressed2 = gui_pressed2_bag and gui_pressed2_bag[child] or false
     if pressed1 or pressed2 then

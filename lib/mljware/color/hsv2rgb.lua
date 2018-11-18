@@ -16,6 +16,6 @@ return function (hue, sat, val)
   end
 
   local mid = val - intensity
-  
+
   return r+mid, g+mid, b+mid
 end

@@ -26,19 +26,19 @@ Button.back_color_pressed = rgb(  0, 116, 225)
 
 Button.text_color         = rgb(255, 255, 255)
 
-local min_width = 64
-local height    = 36
-local x_pad     = 16
+local min_width        = 64
+local preferred_height = 36
+local x_pad            = 16
 
 function Button:init()
   self.preferred_width  = math.max(min_width, roboto.button:getWidth(self.text) + 2*x_pad)
-  self.preferred_height = height
+  self.preferred_height = preferred_height
 end
 
 function Button:draw ()
   if self.pressed then
     self:draw_pressed()
-  elseif self.hovered then 
+  elseif self.hovered then
     self:draw_hover()
   else
     self:draw_normal()
@@ -50,13 +50,13 @@ function Button:draw_normal()
   local cx, cy = x + width/2, y + height/2
 
   local back_color = self.back_color_normal
-  local text_color = self.text_color_default
+  local text_color = self.text_color
 
   -- drop shadow
   smooth_rectangle(x, y, width, height, 2, rgba(0,0,0,0.62))
   -- button
   smooth_rectangle(x, y-1, width, height, 2, back_color)
-  love.graphics.setColor(1, 1, 1)
+  love.graphics.setColor(text_color)
   font_writer.print_aligned(roboto.button, self.text:upper(), cx, cy, "middle", "center")
 end
 

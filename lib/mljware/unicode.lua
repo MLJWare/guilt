@@ -6,7 +6,6 @@ unicode.len  = utf8.len
 unicode.char = utf8.char
 
 local raw_sub = string.sub
-local raw_len = string.len
 
 function unicode.sub(text, i, j)
   if not i then return raw_sub(text, i, j) end

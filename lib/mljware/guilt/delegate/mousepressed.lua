@@ -2,10 +2,10 @@ local subsubpath = (...):match("(.-)[^%.]+%.[^%.]+$")
 
 local ensure = require (subsubpath.."pleasure.ensure")
 
-local is_callable, try_invoke
+local is_callable
 do
   local pleasure = require (subsubpath.."pleasure")
-  is_callable, try_invoke = pleasure.is.callable, pleasure.try.invoke
+  is_callable = pleasure.is.callable
 end
 
 return function (self, mx, my, button, isTouch)
@@ -13,7 +13,7 @@ return function (self, mx, my, button, isTouch)
 
   local press_tag = "pressed"..button
 
-  local x, y, width, height = self:bounds()
+  local x, y = self:bounds()
   mx, my = mx - x, my - y
 
   local scale = self.render_scale or 1

@@ -12,7 +12,7 @@ require "samples"
 
 local gui
 
-function love.load(arg)
+function love.load()
   local w, h = love.graphics.getDimensions()
 
   love.keyboard.setKeyRepeat(true)
@@ -49,7 +49,7 @@ function love.load(arg)
     anchor_y = 0.9;
     align_y  = 0.5;
     text   = "Calculate";
-    mouseclicked = function (self)
+    mouseclicked = function ()
       local status, result = pcall(loadstring("return "..textfield.text))
       if status then
          textfield:set_text(result)
@@ -82,7 +82,7 @@ function love.load(arg)
     align_x  = 0.5;
     anchor_y = 0.5;
     align_y  = 0.5;
-    mouseclicked = function (self, mx, my)
+    mouseclicked = function ()
       gui.render_scale = gui.render_scale*2
       gui.preferred_width  = gui.preferred_width/2
       gui.preferred_height = gui.preferred_height/2
@@ -95,7 +95,7 @@ function love.load(arg)
     align_x  = 0.5;
     anchor_y = 0.5;
     align_y  = 0.5;
-    mouseclicked = function (self, mx, my)
+    mouseclicked = function ()
       gui.render_scale = gui.render_scale/2
       gui.preferred_width  = gui.preferred_width*2
       gui.preferred_height = gui.preferred_height*2
@@ -132,8 +132,7 @@ function love.load(arg)
       anchor_y = 0.25;
       align_y = 0.5;
       text   = "Text";
-      mouseclicked = function (self, mx, my)
-        local dx, dy = mx - self.x, my - self.y
+      mouseclicked = function (self)
         print(("Pressed the %q button"):format(self.text))
         textfield.texttype = nil
       end;
@@ -174,7 +173,7 @@ function love.load(arg)
     }))
 end
 
-for i, callback in ipairs{
+for _, callback in ipairs{
   "keypressed";
   "keyreleased";
   "mousemoved";
@@ -184,7 +183,6 @@ for i, callback in ipairs{
   "textinput";
 } do
   love[callback] = function (...)
-    local width, height = love.graphics.getDimensions()
     try_invoke(gui, callback, ...)
   end
 end

@@ -18,8 +18,8 @@ local clamp                   = require (sub4..".math.clamp")
 local minmax                  = require (sub4..".math.minmax")
 local unicode                 = require (sub4..".unicode")
 
-local function ctrl_is_down () return love.keyboard.isDown("lctrl" , "rctrl" ) end
-local function shift_is_down() return love.keyboard.isDown("lshift", "rshift") end
+local function is_ctrl_down () return love.keyboard.isDown("lctrl" , "rctrl" ) end
+local function is_shift_down() return love.keyboard.isDown("lshift", "rshift") end
 
 local EditableText = {}
 EditableText.__index = EditableText
@@ -46,12 +46,12 @@ function EditableText:set_text(text)
 end
 
 function EditableText:_set_caret(new_caret, select)
-  self.select = (select or shift_is_down()) and (self.select or self.caret) or nil
+  self.select = (select or is_shift_down()) and (self.select or self.caret) or nil
   self.caret  = clamp(new_caret, 1, unicode.len(self.owner.text) + 1)
 end
 
 function EditableText:_text_x()
-  local x, y, width, height = self.owner:bounds()
+  local x, _, width, _ = self.owner:bounds()
 
   local left_x  = x + self.x_pad
   local right_x = left_x + width - 2*self.x_pad
@@ -131,10 +131,10 @@ function EditableText:_select_word ()
   self:_set_caret(math.max(self:_word_end(), self.select + 1), true)
 end
 
-function EditableText:keypressed (key, scancode, isrepeat)
+function EditableText:keypressed (key)
   local select, old_caret = self.select, self.caret
 
-  local ctrl_is_down = ctrl_is_down()
+  local ctrl_is_down = is_ctrl_down()
 
   if ctrl_is_down then
     if key == "a" then
@@ -178,7 +178,7 @@ function EditableText:keypressed (key, scancode, isrepeat)
   end
 end
 
-function EditableText:_mouse_index (mx, my)
+function EditableText:_mouse_index (mx, _)
   local text, text_x = self:text_as_shown(), self:_text_x()
   local text_len = unicode.len(text)
   for i = 0, text_len do
@@ -190,7 +190,7 @@ function EditableText:_mouse_index (mx, my)
   return text_len + 1
 end
 
-function EditableText:mousepressed (mx, my, button_index)
+function EditableText:mousepressed (mx, my, _)
   local new_caret  = self:_mouse_index(mx, my)
   local last_press = self._last_press
   local timestamp  = love.timer.getTime()
@@ -206,7 +206,7 @@ function EditableText:mousepressed (mx, my, button_index)
   end
 end
 
-function EditableText:mousedragged (mx, my, dx, dy, button1, button2)
+function EditableText:mousedragged (mx, my, _, _, button1, _)
   if not button1 or not self._last_press then return end
   self:_set_caret(self:_mouse_index(mx, my), true)
 end
@@ -247,8 +247,6 @@ end
 
 function EditableText:draw_active ()
   local x, y, width, height = self.owner:bounds()
-
-  local text_x = self:_text_x()
 
   if self.drop_shadow then
     smooth_rectangle(x, y + 1, width, height, 2, rgba(0, 0, 0, 0.62))

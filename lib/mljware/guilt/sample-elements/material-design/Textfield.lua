@@ -2,7 +2,6 @@ local path = (...)
 local sub1 = path:match("(.-)%.[^%.]+$")
 local sub2 = sub1:match("(.-)%.[^%.]+$")
 local sub3 = sub2:match("(.-)%.[^%.]+$")
-local sub4 = sub3:match("(.-)%.[^%.]+$")
 
 local EditableText            = require (sub2..".component.EditableText")
 

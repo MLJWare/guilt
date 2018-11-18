@@ -10,12 +10,12 @@ require "lib.mljware.guilt.sample-elements.material-design"
 require "lib.mljware.guilt.sample-elements.layout"
 require "samples"
 
-local gui
+local gui, layout
 
 local nlayout  = guilt.namespace("layout")
 local material = guilt.namespace("material-design")
 
-function love.load(arg)
+function love.load()
   local w, h = love.graphics.getDimensions()
 
   love.keyboard.setKeyRepeat(true)
@@ -59,7 +59,7 @@ function love.load(arg)
 
 end
 
-for i, callback in ipairs{
+for _, callback in ipairs{
   "keypressed";
   "keyreleased";
   "mousemoved";
@@ -69,7 +69,6 @@ for i, callback in ipairs{
   "textinput";
 } do
   love[callback] = function (...)
-    local width, height = love.graphics.getDimensions()
     try_invoke(gui, callback, ...)
   end
 end

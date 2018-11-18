@@ -38,7 +38,7 @@ end
 
 local function element_bounds(self)
   local parent = self._parent
-  local region_x, region_y, region_width, region_height = parent:region_of(self)
+  local _, _, region_width, region_height = parent:region_of(self)
   local x, y, width, height = self.x, self.y, self:size()
 
   local anchor_x = self.anchor_x or 0
@@ -70,7 +70,7 @@ local function element_reverse_children(self)
   return reverse_ipairs(self._children)
 end
 
-local function element_region_of(self, child)
+local function element_region_of(self, _)
   local width, height = self:size()
   return 0, 0, width, height
 end
@@ -86,8 +86,6 @@ function Template.__index(template, key)
 end
 
 local guilt = {}
-local _templates = {}
-local _needs = {}
 
 local function _new(template, props)
   local self = props or {}
@@ -145,7 +143,7 @@ end
 function guilt.namespace(namespace_id)
   local namespace = _namespaces[namespace_id]
   if not namespace then
-    namespace = setmetatable({ 
+    namespace = setmetatable({
       _id        = namespace_id;
       _templates = {};
       _needs     = {};
@@ -162,9 +160,9 @@ function GUI:new(template, props)
   --insist(is.table(template), "No template named %q exist.", template_id)
   --insist(getmetatable(template) ~= Template, "Template %q must be finalized before use.", template_id)
 
-  local needs = _needs[template_id]
+  local needs = template._namespace_._needs[template]
   if needs then
-    insist(is.table (props), "Template `%s` needs property table on creation.", template_id)
+    insist(is.table (props), "Template `%s` needs property table on creation.", template._id)
     enforce(needs, props)
   end
 
@@ -181,7 +179,7 @@ function GUI:draw ()
   local x, y, width, height = self:bounds()
   pleasure.push_region(x, y, width*scale, height*scale)
   pleasure.scale(self.render_scale)
-  for i, child in self:reverse_children() do
+  for _, child in self:reverse_children() do
     pleasure.try.invoke(child, "draw")
   end
   pleasure.pop_region()
@@ -308,7 +306,7 @@ function Template:from(parent)
 
   local parent_needs = self._namespace_._needs[parent]
   if parent_needs then
-    local needs = ensure(_needs, self)
+    local needs = ensure(self._namespace_._needs, self)
     for k, v in pairs(parent_needs) do
       if not needs[k] then
         needs[k] = v

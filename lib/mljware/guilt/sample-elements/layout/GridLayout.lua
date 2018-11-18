@@ -2,20 +2,10 @@ local path = (...)
 local sub1 = path:match("(.-)%.[^%.]+$")
 local sub2 = sub1:match("(.-)%.[^%.]+$")
 local sub3 = sub2:match("(.-)%.[^%.]+$")
-local sub4 = sub3:match("(.-)%.[^%.]+$")
-
-local roboto                  = require (sub2..".material-design.roboto")
-
-local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
-local font_writer             = require (sub2..".utils.font_writer")
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
-local rgb                     = require (sub4..".color.rgb")
-local rgba                    = require (sub4..".color.rgba")
 
-local is_callable = pleasure.is.callable
-local try_invoke  = pleasure.try.invoke
 
 local namespace = guilt.namespace("layout")
 
@@ -32,7 +22,6 @@ end
 -- TODO better handling of (optional) indices, `i` and `j`
 function GridLayout:add_child(child, i, j)
   local column_count, row_count = self.column_count, self.row_count
-  local index
   if not (i and j)
   or i < 1 or i > column_count
   or j < 1 or j > row_count then
@@ -45,7 +34,7 @@ function GridLayout:add_child(child, i, j)
   child._parent = self
 end
 
-function GridLayout:add_children(...)
+function GridLayout:add_children()
   error ("Method `add_children` not allowed with GridLayout.")
 end
 

@@ -4,10 +4,7 @@ local sub2 = sub1:match("(.-)%.[^%.]+$")
 local sub3 = sub2:match("(.-)%.[^%.]+$")
 local sub4 = sub3:match("(.-)%.[^%.]+$")
 
-local roboto                  = require (sub1..".roboto")
-
 local smooth_line             = require (sub2..".utils.smooth_line")
-local smooth_circle           = require (sub2..".utils.smooth_circle")
 local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
 
 local guilt                   = require (sub3)
@@ -49,35 +46,34 @@ function ScrollH:draw()
   self:draw_knob(x, y, width, height, knob_x, knob_width)
 end
 
-function ScrollH:draw_bar(x, y, width, height, knob_x, knob_width)
+function ScrollH:draw_bar(x, y, width, height, _, _)
   smooth_line(x, y + height/2, x + width, y + height/2, 1, rgb(6, 138, 79))
 end
 
-function ScrollH:draw_knob(x, y, width, height, knob_x, knob_width)
+function ScrollH:draw_knob(_, y, _, height, knob_x, knob_width)
   local h = height - 2
   local r = h/2
   smooth_rectangle(knob_x, y+2, knob_width, h, r, rgba(0, 0, 0, 0.5))
   smooth_rectangle(knob_x, y+1, knob_width, h, r, rgb(13, 213, 109))
 end
 
-function ScrollH:mousedragged (mx, my, dx, dy, button1, button2)
+function ScrollH:mousedragged (mx, _, _, _, button1, _)
   if not button1 then return end
   local x, _, width = self:bounds()
 
   self:set_progress(((mx - self._knob_dx) - x)/(width - self.knob_width))
 end
 
-function ScrollH:mousepressed (mx, my, button_index)
+function ScrollH:mousepressed (mx, _, button_index)
   if button_index ~= 1 then return end
 
-  local x, y, width, height = self:bounds()
+  local x, _, width, _ = self:bounds()
   local x2 = x + width
 
   local old_progress = self.progress
   local knob_width = self.knob_width
 
   local knob_x = x + (width - knob_width)*old_progress
-  local knob_y = y + height/2
   if knob_x <= mx and mx < knob_x + knob_width then
     self._knob_dx = mx - knob_x
     -- clicked on the knob, don't update `progress` value

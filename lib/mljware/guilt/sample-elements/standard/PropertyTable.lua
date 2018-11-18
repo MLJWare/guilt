@@ -6,8 +6,6 @@ local sub4 = sub3:match("(.-)%.[^%.]+$")
 
 local roboto                  = require (sub2..".material-design.roboto")
 
-local smooth_line             = require (sub2..".utils.smooth_line")
-local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
 local font_writer             = require (sub2..".utils.font_writer")
 
 local EditableText            = require (sub2..".component.EditableText")
@@ -16,15 +14,8 @@ local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
 
 local rgb                     = require (sub4..".color.rgb")
-local rgba                    = require (sub4..".color.rgba")
-local clamp                   = require (sub4..".math.clamp")
-local minmax                  = require (sub4..".math.minmax")
-local unicode                 = require (sub4..".unicode")
 
 local group_gen               = require (sub1..".group-gen")
-
-local function ctrl_is_down () return love.keyboard.isDown("lctrl" , "rctrl" ) end
-local function shift_is_down() return love.keyboard.isDown("lshift", "rshift") end
 
 local function hline(x, y, width, color)
   x, y, width = math.floor(x), math.floor(y), math.floor(width)
@@ -137,7 +128,7 @@ function PropertyTable:_find_field_at(mx, my)
       new_dy = new_dy + group:len()*row_height
     end
     if new_dy > my then
-      local prev_width, index = 0
+      local prev_width = 0
       local column_count = #self.column_names
       local row_index    = math.floor((my - dy)/row_height)
       for i = 1, column_count do
@@ -278,7 +269,7 @@ function PropertyTable:draw()
   rect_line(x, y, width, height, outline_color)
 end
 
-function PropertyTable:draw_head(width, height)
+function PropertyTable:draw_head(width, _)
   rect_fill(0, 0, width, row_mid_y, rgb(192, 203, 220))
   rect_fill(0, 0, width, 1, rgb(205, 214, 227))
   rect_fill(0, row_mid_y, width, row_mid_y, rgb(180, 193, 213))

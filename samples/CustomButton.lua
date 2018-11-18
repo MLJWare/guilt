@@ -5,7 +5,6 @@ local font_writer             = require "lib.mljware.guilt.sample-elements.utils
 
 local guilt                   = require "lib.mljware.guilt"
 local pleasure                = require "lib.mljware.guilt.pleasure"
-local rgb                     = require "lib.mljware.color.rgb"
 local rgba                    = require "lib.mljware.color.rgba"
 
 -- Example showing how to extend/override existing UI elements using the

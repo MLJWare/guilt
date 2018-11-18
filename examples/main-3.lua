@@ -16,7 +16,7 @@ local square
 
 local material = guilt.namespace("material-design")
 
-function love.load(arg)
+function love.load()
   local w, h = love.graphics.getDimensions()
 
   love.keyboard.setKeyRepeat(true)
@@ -58,7 +58,7 @@ function love.load(arg)
     preferred_width = 200;
     progress = 0.5;
     knob_width = 100;
-    on_change = function (self, old_progress)
+    on_change = function (self)
       square.x = math.floor(self.progress*150 + 0.5)
       textfield:set_text(("%d, %d"):format(square.x, square.y))
     end;
@@ -71,7 +71,7 @@ function love.load(arg)
     preferred_height = 200;
     progress = 0.5;
     knob_height = 100;
-    on_change = function (self, old_progress)
+    on_change = function (self)
       square.y = math.floor(self.progress*150 + 0.5)
       textfield:set_text(("%d, %d"):format(square.x, square.y))
     end;
@@ -94,7 +94,7 @@ function love.wheelmoved(dx, dy)
   scroll_v.knob_height = math.max(10, math.min(scroll_v.knob_height + dy, scroll_v.preferred_height))
 end
 
-for i, callback in ipairs{
+for _, callback in ipairs{
   "keypressed";
   "keyreleased";
   "mousemoved";
@@ -104,7 +104,6 @@ for i, callback in ipairs{
   "textinput";
 } do
   love[callback] = function (...)
-    local width, height = love.graphics.getDimensions()
     try_invoke(gui, callback, ...)
   end
 end
