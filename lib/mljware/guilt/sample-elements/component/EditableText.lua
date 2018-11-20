@@ -46,8 +46,9 @@ function EditableText:set_text(text)
 end
 
 function EditableText:_set_caret(new_caret, select)
-  self.select = (select or is_shift_down()) and (self.select or self.caret) or nil
+  self.select = (select or (select == nil and is_shift_down())) and (self.select or self.caret) or nil
   self.caret  = clamp(new_caret, 1, unicode.len(self.owner.text) + 1)
+  self:_text_x()
 end
 
 function EditableText:_text_x()
@@ -82,7 +83,7 @@ function EditableText:_paste_text(input)
   end
   input = input:gsub("\n", "")
   self.owner.text = unicode.splice(self.owner.text, start, input, stop - start)
-  self.caret = start + unicode.len(input)
+  self:_set_caret(start + unicode.len(input), false)
 end
 
 function EditableText:textinput (input)
@@ -190,7 +191,7 @@ function EditableText:_mouse_index (mx, _)
   return text_len + 1
 end
 
-function EditableText:mousepressed (mx, my, _)
+function EditableText:mousepressed (mx, my)
   local new_caret  = self:_mouse_index(mx, my)
   local last_press = self._last_press
   local timestamp  = love.timer.getTime()
@@ -220,6 +221,8 @@ function EditableText:text_as_shown()
 end
 
 function EditableText:draw_default ()
+  self:_set_caret(1, false) -- HACK resets caret & selection when not active
+
   local x, y, width, height = self.owner:bounds()
   local text = self:text_as_shown()
 

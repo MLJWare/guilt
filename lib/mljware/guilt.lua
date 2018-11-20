@@ -5,6 +5,8 @@ local invoker                 = require (path..".pleasure.invoker")
 local clone                   = require (path..".pleasure.clone")
 local ensure                  = require (path..".pleasure.ensure")
 
+local EMPTY = {}
+
 local function insist(condition, message, a)
   if condition then return end
   error(message:format(a), 3)
@@ -54,7 +56,7 @@ local function element_bounds(self)
 end
 
 local function element_children(self)
-  return ipairs(self._children)
+  return ipairs(self._children or EMPTY)
 end
 
 local function previous(t, i)
@@ -73,6 +75,15 @@ end
 local function element_region_of(self, _)
   local width, height = self:size()
   return 0, 0, width, height
+end
+
+local function element_deactivate(self)
+  self.active = nil
+  if is.callable(self.children) then
+    for _, child in self:children() do
+      child:deactivate()
+    end
+  end
 end
 
 local Template = {}
@@ -199,6 +210,7 @@ GUI.add_children  = add_children
 GUI.region_of     = element_region_of
 GUI.children      = element_children
 GUI.reverse_children = element_reverse_children
+GUI.deactivate    = element_deactivate
 GUI.mousepressed  = require "lib.mljware.guilt.delegate.mousepressed"
 GUI.mousewheelmoved = require "lib.mljware.guilt.delegate.mousewheelmoved"
 GUI.mousemoved    = require "lib.mljware.guilt.delegate.mousemoved"
@@ -206,6 +218,7 @@ GUI.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
 GUI.textinput     = require "lib.mljware.guilt.delegate.textinput"
 GUI.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
 GUI.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
+
 
 function Namespace:template(template_id)
   insist(is.string(template_id), "Template id must be a string.")
@@ -272,6 +285,7 @@ function Namespace:finalize_template(template)
 
   template.bounds       = element_bounds
   template.size         = element_size
+  template.deactivate   = element_deactivate
   template.__index      = template
 
   template._kind_ = self._templates[template]
@@ -299,6 +313,7 @@ function Template:from(parent)
     if is.string(k)
     and k ~= "__index"
     and k ~= "bounds"
+    and k ~= "deactivate"
     and k ~= "size" then
       self[k] = clone(v)
     end
