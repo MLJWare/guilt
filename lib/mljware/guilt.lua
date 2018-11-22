@@ -273,6 +273,7 @@ function GUI:mousemoved(mx, my, dx, dy)
 
   local gui_pressed1_bag = self.tags.pressed1
   local gui_pressed2_bag = self.tags.pressed2
+  local gui_pressed3_bag = self.tags.pressed3
   local gui_hovered_bag  = ensure(self.tags, "hovered")
 
   local not_found = true
@@ -301,8 +302,9 @@ function GUI:mousemoved(mx, my, dx, dy)
 
     local pressed1 = gui_pressed1_bag and gui_pressed1_bag[child] or false
     local pressed2 = gui_pressed2_bag and gui_pressed2_bag[child] or false
-    if pressed1 or pressed2 then
-      try_invoke(child, "mousedragged", mx, my, dx, dy, pressed1, pressed2)
+    local pressed3 = gui_pressed3_bag and gui_pressed3_bag[child] or false
+    if pressed1 or pressed2 or pressed3 then
+      try_invoke(child, "mousedragged", mx, my, dx, dy, pressed1, pressed2, pressed3)
     end
   end
 end
