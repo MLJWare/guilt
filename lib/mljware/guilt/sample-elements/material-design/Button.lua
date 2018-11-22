@@ -7,9 +7,9 @@ local sub4 = sub3:match("(.-)%.[^%.]+$")
 local roboto                  = require (sub1..".roboto")
 
 local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
-local font_writer             = require (sub2..".utils.font_writer")
 
 local guilt                   = require (sub3)
+local font_writer             = require (sub3..".font_writer")
 local pleasure                = require (sub3..".pleasure")
 local NOP                     = require (sub3..".pleasure.NOP")
 

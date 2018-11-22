@@ -8,10 +8,9 @@ local roboto                  = require (sub2..".material-design.roboto")
 
 local smooth_line             = require (sub2..".utils.smooth_line")
 local smooth_rectangle        = require (sub2..".utils.smooth_rectangle")
-local font_writer             = require (sub2..".utils.font_writer")
+local font_writer             = require (sub3..".font_writer")
 
 local pleasure                = require (sub3..".pleasure")
-
 local rgb                     = require (sub4..".color.rgb")
 local rgba                    = require (sub4..".color.rgba")
 local clamp                   = require (sub4..".math.clamp")
@@ -21,6 +20,8 @@ local unicode                 = require (sub4..".unicode")
 local function is_ctrl_down () return love.keyboard.isDown("lctrl" , "rctrl" ) end
 local function is_shift_down() return love.keyboard.isDown("lshift", "rshift") end
 
+local is_callable = pleasure.is.callable
+
 local EditableText = {}
 EditableText.__index = EditableText
 
@@ -29,6 +30,8 @@ function EditableText.new(class, owner)
     owner = owner;
     caret =  1;
     off_x =  0;
+    x     =  0;
+    y     =  0;
   }, class)
   return self
 end
@@ -40,9 +43,18 @@ EditableText.double_click_delay = 0.5
 EditableText.font               = roboto.body1
 
 function EditableText:set_text(text)
-  self.owner.text = tostring(text or "")
+  self:_set_text(tostring(text or ""))
   self.select = nil
   self.caret  = unicode.len(self.owner.text) + 1
+end
+
+function EditableText:_set_text(text)
+  local owner = self.owner
+  local old_text = owner.text
+  owner.text = text
+  if is_callable(self.on_change) then
+    self:on_change(text, old_text)
+  end
 end
 
 function EditableText:_set_caret(new_caret, select)
@@ -51,10 +63,15 @@ function EditableText:_set_caret(new_caret, select)
   self:_text_x()
 end
 
-function EditableText:_text_x()
-  local x, _, width, _ = self.owner:bounds()
+function EditableText:bounds()
+  local x, y, width, height = self.owner:bounds()
+  return x, y, self.width or width, self.height or height
+end
 
-  local left_x  = x + self.x_pad
+function EditableText:_text_x()
+  local x, _, width, _ = self:bounds()
+
+  local left_x  = x + self.x_pad + self.x
   local right_x = left_x + width - 2*self.x_pad
   local caret_x = left_x + self.font:getWidth(unicode.sub(self:text_as_shown(), 1, self.caret - 1))
   local off_x = self.off_x
@@ -71,6 +88,7 @@ function EditableText:_text_x()
   return left_x + off_x
 end
 
+
 function EditableText:_paste_text(input)
   local select, old_caret = self.select, self.caret
   local start, stop
@@ -82,8 +100,9 @@ function EditableText:_paste_text(input)
     start, stop = old_caret, old_caret
   end
   input = input:gsub("\n", "")
-  self.owner.text = unicode.splice(self.owner.text, start, input, stop - start)
+  self:_set_text(unicode.splice(self.owner.text, start, input, stop - start))
   self:_set_caret(start + unicode.len(input), false)
+
 end
 
 function EditableText:textinput (input)
@@ -158,11 +177,11 @@ function EditableText:keypressed (key)
     if select then
       local start  = math.min(select, old_caret)
       local length = math.abs(select - old_caret)
-      self.owner.text = unicode.splice(self.owner.text, start, "", length)
+      self:_set_text(unicode.splice(self.owner.text, start, "", length))
       self:_set_caret(start)
       self.select = nil
     elseif self.caret > 1 then
-      self.owner.text = unicode.splice(self.owner.text, self.caret - 1, "", 1)
+      self:_set_text(unicode.splice(self.owner.text, self.caret - 1, "", 1))
       self:_set_caret(self.caret - 1)
     end
     return
@@ -223,52 +242,39 @@ end
 function EditableText:draw_default ()
   self:_set_caret(1, false) -- HACK resets caret & selection when not active
 
-  local x, y, width, height = self.owner:bounds()
+  local x, y, width, height = self:bounds()
+
   local text = self:text_as_shown()
-
-  if self.drop_shadow then
-    smooth_rectangle(x, y + 1, width, height, 2, rgba(0, 0, 0, 0.62))
-  end
-  -- field
-  smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
-
   pleasure.push_region(x + self.x_pad, y, width - 2*self.x_pad, height)
   do
-    local dy = height/2
+    local dy = self.y + height/2
 
     if #text == 0 then
       love.graphics.setColor(self.hint_color)
-      font_writer.print_aligned(self.font, self.owner.hint, 0, dy, "left", "center")
+      font_writer.print_aligned(self.font, self.owner.hint, self.x, dy, "left", "center")
     else
       -- TODO if text is to long, add elipsis near right border
       love.graphics.setColor(self.text_color)
-      font_writer.print_aligned(self.font, text, 0, dy, "left", "center")
+      font_writer.print_aligned(self.font, text, self.x, dy, "left", "center")
     end
   end
   pleasure.pop_region()
 end
 
 function EditableText:draw_active ()
-  local x, y, width, height = self.owner:bounds()
-
-  if self.drop_shadow then
-    smooth_rectangle(x, y + 1, width, height, 2, rgba(0, 0, 0, 0.62))
-  end
-  -- field
-  smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
-
+  local x, y, width, height = self:bounds()
   pleasure.push_region(x + self.x_pad, y, width - 2*self.x_pad + 2, height)
   pleasure.translate(self.off_x, 0)
   do
     local text, caret = self:text_as_shown(), self.caret
 
-    local dy = height/2
+    local dy = self.y + height/2
 
     local blink = (love.timer.getTime() % 1 < 0.5)
     if not blink then -- show caret
       local left  = unicode.sub(text, 1, caret - 1)
       local caret_x = self.font:getWidth(left) + 1
-      smooth_line(caret_x, dy - 6, caret_x, dy + 6, 1, rgb(0, 0, 0))
+      smooth_line(caret_x, dy - 6, caret_x, dy + 6, 1, self.text_color)
     end
 
     local select = self.select
@@ -282,7 +288,7 @@ function EditableText:draw_active ()
     end
 
     love.graphics.setColor(self.text_color)
-    font_writer.print_aligned(self.font, text, 0, dy - 1, "left", "center")
+    font_writer.print_aligned(self.font, text, self.x, dy - 1, "left", "center")
   end
 
   pleasure.pop_region()

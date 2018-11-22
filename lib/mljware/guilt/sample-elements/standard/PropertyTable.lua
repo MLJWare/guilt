@@ -6,11 +6,11 @@ local sub4 = sub3:match("(.-)%.[^%.]+$")
 
 local roboto                  = require (sub2..".material-design.roboto")
 
-local font_writer             = require (sub2..".utils.font_writer")
 
 local EditableText            = require (sub2..".component.EditableText")
 
 local guilt                   = require (sub3)
+local font_writer             = require (sub3..".font_writer")
 local pleasure                = require (sub3..".pleasure")
 
 local rgb                     = require (sub4..".color.rgb")
@@ -151,8 +151,8 @@ function PropertyTable:_column_dx_width(column_index)
   local split_pct  = split_pcts[column_index]
   local split_pct_prev = split_pcts[column_index - 1]
 
-  local dx          = split_pct_prev*width
-  local field_width = (split_pct - split_pct_prev)*width
+  local dx          = math.floor(split_pct_prev*width)
+  local field_width = math.floor((split_pct - split_pct_prev)*width)
 
   return dx, field_width
 end
@@ -245,6 +245,7 @@ end
 
 function PropertyTable:draw()
   local x, y, width, height = self:bounds()
+  x, y, width, height = math.floor(x), math.floor(y), math.floor(width), math.floor(height)
   love.graphics.setColor(.25,.25,.25)
 
   rect_fill(x, y, width, height, fill_color)
@@ -257,7 +258,7 @@ function PropertyTable:draw()
   for _, group in ipairs(self._groups) do
     local remaining_height = height - dy
     if remaining_height <= 0 then break end
-    dy = dy + self:draw_group(group, width, remaining_height, dy)
+    dy = math.floor(dy + self:draw_group(group, width, remaining_height, dy))
   end
   pleasure.pop_region()
 

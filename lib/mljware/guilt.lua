@@ -4,6 +4,11 @@ local is                      = require (path..".pleasure.is")
 local invoker                 = require (path..".pleasure.invoker")
 local clone                   = require (path..".pleasure.clone")
 local ensure                  = require (path..".pleasure.ensure")
+local try_invoke              = require (path..".pleasure.try").invoke
+
+
+
+local is_callable = is.callable
 
 local EMPTY = {}
 
@@ -40,7 +45,7 @@ end
 
 local function element_bounds(self)
   local parent = self._parent
-  local _, _, region_width, region_height = parent:region_of(self)
+  local region_x, region_y, region_width, region_height = parent:region_of(self)
   local x, y, width, height = self.x, self.y, self:size()
 
   local anchor_x = self.anchor_x or 0
@@ -49,10 +54,18 @@ local function element_bounds(self)
   local align_x  = self.align_x or 0
   local align_y  = self.align_y or 0
 
-  return x + anchor_x*region_width  - align_x*width
-       , y + anchor_y*region_height - align_y*height
-       , width
-       , height
+  local bounds_width  = math.min(region_width , width)
+  local bounds_height = math.min(region_height, height)
+  local bounds_x
+  local bounds_y
+
+  bounds_x = region_x + x + anchor_x*region_width  - align_x*bounds_width
+  bounds_y = region_y + y + anchor_y*region_height - align_y*bounds_height
+
+  return bounds_x
+       , bounds_y
+       , bounds_width
+       , bounds_height
 end
 
 local function element_children(self)
@@ -98,7 +111,7 @@ end
 
 local guilt = {}
 
-local function _new(template, props)
+local function _new(gui, template, props)
   local self = props or {}
   for k, v in pairs(template) do
     if not (is.string(k) and k:find("^__"))
@@ -107,6 +120,7 @@ local function _new(template, props)
     end
   end
   setmetatable(self, template)
+  self._guilt_gui_ = gui
   pleasure.try.invoke(self, "init")
   return self
 end
@@ -177,10 +191,8 @@ function GUI:new(template, props)
     enforce(needs, props)
   end
 
-  local instance = _new(template, props)
+  local instance = _new(self, template, props)
   enforce(basic_needs, instance)
-
-  instance._guilt_gui_ = self
 
   return instance
 end
@@ -211,13 +223,154 @@ GUI.region_of     = element_region_of
 GUI.children      = element_children
 GUI.reverse_children = element_reverse_children
 GUI.deactivate    = element_deactivate
-GUI.mousepressed  = require "lib.mljware.guilt.delegate.mousepressed"
-GUI.mousewheelmoved = require "lib.mljware.guilt.delegate.mousewheelmoved"
-GUI.mousemoved    = require "lib.mljware.guilt.delegate.mousemoved"
-GUI.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
 GUI.textinput     = require "lib.mljware.guilt.delegate.textinput"
 GUI.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
 GUI.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
+
+function GUI:mousepressed(mx, my, button, isTouch)
+  self.active = true
+  local press_tag = "pressed"..button
+
+  local x, y = self:bounds()
+  mx, my = mx - x, my - y
+
+  local scale = self.render_scale or 1
+  mx, my = mx/scale, my/scale
+
+  local gui_tag_bag = ensure(self.tags, press_tag)
+
+  local no_press = true
+
+  for _, child in self:children() do
+    -- TODO ensure [mx, my] contained in region
+    child.active = nil
+    if  no_press
+    and child:contains(mx, my) then
+      gui_tag_bag[child] = true
+      child[press_tag] = true
+      child.pressed    = true
+      if is_callable(child.mousepressed) then
+        child:mousepressed(mx, my, button, isTouch)
+        no_press = false
+      end
+    end
+  end
+
+  if no_press then
+    self:deactivate()
+  end
+
+  return not no_press
+end
+
+function GUI:mousemoved(mx, my, dx, dy)
+  local x, y = self:bounds()
+  mx, my = mx - x, my - y
+
+  local scale = self.render_scale or 1
+  mx, my = mx/scale, my/scale
+  dx, dy = dx/scale, dy/scale
+
+  local gui_pressed1_bag = self.tags.pressed1
+  local gui_pressed2_bag = self.tags.pressed2
+  local gui_hovered_bag  = ensure(self.tags, "hovered")
+
+  local not_found = true
+  for _, child in self:children() do
+    -- TODO ensure [mx, my] contained in region
+    if  not_found
+    and child:contains(mx, my) then
+      gui_hovered_bag[child] = true
+      if  not child.hovered
+      and is_callable(child.mouseenter) then
+        child:mouseenter(mx, my, dx, dy)
+      end
+      child.hovered = true
+      if is_callable(child.mousemoved) then
+        child:mousemoved(mx, my, dx, dy)
+        not_found = false
+      end
+    else
+      gui_hovered_bag[child] = nil
+      if  child.hovered
+      and is_callable(child.mouseleave) then
+        child:mouseleave(mx, my, dx, dy)
+      end
+      child.hovered = nil
+    end
+
+    local pressed1 = gui_pressed1_bag and gui_pressed1_bag[child] or false
+    local pressed2 = gui_pressed2_bag and gui_pressed2_bag[child] or false
+    if pressed1 or pressed2 then
+      try_invoke(child, "mousedragged", mx, my, dx, dy, pressed1, pressed2)
+    end
+  end
+end
+
+function GUI:wheelmoved(wheel_dx, wheel_dy)
+  local x, y = self:bounds()
+  local mx, my = love.mouse.getPosition()
+  mx, my = mx - x, my - y
+
+  local scale = self.render_scale or 1
+  mx, my = mx/scale, my/scale
+
+  for _, child in self:children() do
+    -- TODO ensure [mx, my] contained in region
+    if  child:contains(mx, my)
+    and is_callable(child.mousewheelmoved) then
+      child:mousewheelmoved(mx, my, wheel_dx, wheel_dy)
+      break
+    end
+  end
+end
+
+function GUI:mousereleased(mx, my, button, isTouch)
+  local press_tag = "pressed"..button
+
+  local x, y = self:bounds()
+  mx, my = mx - x, my - y
+
+  local scale = self.render_scale or 1
+  mx, my = mx/scale, my/scale
+
+  local gui_tags = self.tags
+  local gui_tag_bag = ensure(gui_tags, press_tag)
+
+  local no_release = true
+  local no_click   = true
+  for _, child in self:children() do
+    -- TODO ensure [mx, my] contained in region
+    if  child:contains(mx, my) then
+      if no_release and is_callable(child.mousereleased) then
+        child:mousereleased(mx, my, button, isTouch)
+        no_release = false
+      end
+
+      if no_click and gui_tag_bag[child] and is_callable(child.mouseclicked) then
+        child:mouseclicked(mx, my, button)
+        no_click = false
+      end
+    end
+  end
+
+  local pressed1 = ensure(gui_tags, "pressed1")
+  local pressed2 = ensure(gui_tags, "pressed2")
+  local pressed3 = ensure(gui_tags, "pressed3")
+
+  for child in pairs(gui_tag_bag) do
+    child[press_tag]   = nil
+    gui_tag_bag[child] = nil
+
+    child.pressed = pressed1[child]
+                  or pressed2[child]
+                  or pressed3[child]
+                  or nil
+  end
+
+  return not no_release
+end
+
 
 
 function Namespace:template(template_id)

@@ -5,6 +5,7 @@ local hsv2rgb                 = require (subpath.."hsv2rgb")
 local _cache = {}
 
 local Color = {
+  _kind_     = "Color";
   __tostring = function (self)
     local r, g, b, a = unpack(self)
     r = r*255

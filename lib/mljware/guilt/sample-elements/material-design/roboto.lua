@@ -2,8 +2,6 @@ local path = (...)
 local sub1 = path:match("(.-)%.[^%.]+$")
 local sub2 = sub1:match("(.-)%.[^%.]+$")
 
-local OS = love.system.getOS()
-
 local font_path = sub2:gsub("%.", "/").."/res/font/%s/%s.ttf"
 
 local dpi_scale = love.window.getDPIScale()

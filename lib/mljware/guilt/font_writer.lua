@@ -16,8 +16,8 @@ function font_writer.print_aligned(font, text, x, y, align_x, align_y)
   local width  = font:getWidth(text)
   local height = font:getHeight()*line_count
 
-  local dx = alignment[align_x or "left"] or 0
-  local dy = alignment[align_y or "top" ] or 0
+  local dx = type(align_x) == "string" and alignment[align_x or "left"] or align_x or 0
+  local dy = type(align_y) == "string" and alignment[align_y or "top" ] or align_y or 0
 
   love.graphics.setFont(font)
   love.graphics.print(text, round(x + dx*width), round(y + dy*height))

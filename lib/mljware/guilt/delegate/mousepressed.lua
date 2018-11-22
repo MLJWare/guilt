@@ -16,27 +16,21 @@ return function (self, mx, my, button, isTouch)
   local x, y = self:bounds()
   mx, my = mx - x, my - y
 
-  local scale = self.render_scale or 1
-  mx, my = mx/scale, my/scale
-
   local gui = self._guilt_gui_
   local gui_tag_bag = ensure(gui.tags, press_tag)
 
   local no_press = true
 
-  for _, child, region_x, region_y, region_width, region_height in self:children() do
-    local child_mx, child_my = mx - (region_x or 0), my - (region_y or 0)
+  for _, child in self:children() do
     -- TODO ensure [mx, my] contained in region
     child.active = nil
     if  no_press
-    and child_mx >= 0 and (region_width or math.huge) >= child_mx
-    and child_my >= 0 and (region_height or math.huge) >= child_my
-    and child:contains(child_mx, child_my) then
+    and child:contains(mx, my) then
       gui_tag_bag[child] = true
       child[press_tag] = true
       child.pressed    = true
       if is_callable(child.mousepressed) then
-        child:mousepressed(child_mx, child_my, button, isTouch)
+        child:mousepressed(mx, my, button, isTouch)
         no_press = false
       end
     end
@@ -45,4 +39,6 @@ return function (self, mx, my, button, isTouch)
   if no_press then
     self:deactivate()
   end
+
+  return not no_press
 end

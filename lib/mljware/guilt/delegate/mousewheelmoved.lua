@@ -10,18 +10,12 @@ return function (self, mx, my, wheel_dx, wheel_dy)
   local x, y = self:bounds()
   mx, my = mx - x, my - y
 
-  local scale = self.render_scale or 1
-  mx, my = mx/scale, my/scale
-
-  for _, child, region_x, region_y, region_width, region_height in self:children() do
-    local mx, my = mx - (region_x or 0), my - (region_y or 0)
+  for _, child in self:children() do
     -- TODO ensure [mx, my] contained in region
-    if  mx >= 0 and (region_width or math.huge) > mx
-    and my >= 0 and (region_height or math.huge) > my
-    and child:contains(mx, my)
+    if  child:contains(mx, my)
     and is_callable(child.mousewheelmoved) then
       child:mousewheelmoved(mx, my, wheel_dx, wheel_dy)
-      break
+      return true
     end
   end
 end

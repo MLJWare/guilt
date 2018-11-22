@@ -2,12 +2,17 @@ local path = (...)
 local sub1 = path:match("(.-)%.[^%.]+$")
 local sub2 = sub1:match("(.-)%.[^%.]+$")
 local sub3 = sub2:match("(.-)%.[^%.]+$")
+local sub4 = sub3:match("(.-)%.[^%.]+$")
 
 local EditableText            = require (sub2..".component.EditableText")
 
 local guilt                   = require (sub3)
 local pleasure                = require (sub3..".pleasure")
 local NOP                     = require (sub3..".pleasure.NOP")
+local smooth_rectangle        = require (sub3..".sample-elements.utils.smooth_rectangle")
+
+local rgb                     = require (sub4..".color.rgb")
+local rgba                    = require (sub4..".color.rgba")
 
 local namespace = guilt.namespace("material-design")
 
@@ -18,14 +23,14 @@ local Textfield = namespace:template("Textfield"):needs{
 Textfield.double_click_delay = 0.5
 
 local min_width = 280
-local height    =  56
+local preferred_height = 56
 
 function Textfield:init()
   self.text   = ""
   self._edit_ = EditableText:new(self)
   self._edit_.drop_shadow = true
   self.preferred_width  = math.max(self.preferred_width or 0, min_width)
-  self.preferred_height = height
+  self.preferred_height = preferred_height
 end
 
 function Textfield:set_text(text)
@@ -45,11 +50,19 @@ function Textfield:text_as_shown()
 end
 
 function Textfield:draw_default ()
+  self:draw_back()
   self._edit_:draw_default ()
 end
 
 function Textfield:draw_active ()
+  self:draw_back()
   self._edit_:draw_active ()
+end
+
+function Textfield:draw_back()
+  local x, y, width, height = self:bounds()
+  smooth_rectangle(x, y + 1, width, height, 2, rgba(0, 0, 0, 0.62))
+  smooth_rectangle(x, y, width, height, 2, rgb(255, 255, 255))
 end
 
 function Textfield:textinput (input)

@@ -1,9 +1,9 @@
 local roboto                  = require "lib.mljware.guilt.sample-elements.material-design.roboto"
 
 local smooth_rectangle        = require "lib.mljware.guilt.sample-elements.utils.smooth_rectangle"
-local font_writer             = require "lib.mljware.guilt.sample-elements.utils.font_writer"
 
 local guilt                   = require "lib.mljware.guilt"
+local font_writer             = require "lib.mljware.guilt.font_writer"
 local pleasure                = require "lib.mljware.guilt.pleasure"
 local rgba                    = require "lib.mljware.color.rgba"
 

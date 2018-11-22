@@ -60,48 +60,51 @@ function GridLayout:children()
   end)
 end
 
+function GridLayout:index_of(child)
+  local content = self.content
+  for index = 1, #content do
+    if content[index] == child then
+      return index
+    end
+  end
+end
+
+function GridLayout:region_of(child)
+  local index = self:index_of(child)
+  assert(index, "Trying to call 'region_of' on non-child element.")
+
+  local column_count = self.column_count
+  local row_count    = self.row_count
+
+  local _, _, width, height = self:bounds()
+  local cell_width  = width/column_count
+  local cell_height = height/row_count
+
+  local dx = ((index - 1)%column_count)*cell_width
+  local dy = math.floor((index - 1)/column_count)*cell_height
+
+  return dx, dy, cell_width, cell_height
+end
+
 function GridLayout:reverse_children()
   return coroutine.wrap(function ()
     local content = self.content
     local column_count = self.column_count
     local row_count    = self.row_count
 
-    local _, _, width, height = self:bounds()
-    local cell_width  = width/column_count
-    local cell_height = height/row_count
-
     for index = column_count*row_count, 1, -1 do
       local element = content[index]
       if element then
-        local dx = ((index - 1)%column_count)*cell_width
-        local dy = math.floor((index - 1)/column_count)*cell_height
-        coroutine.yield(index, element, dx, dy, cell_width, cell_height)
+        coroutine.yield(index, element)
       end
     end
   end)
 end
 
-function GridLayout:region_of(child)
-  local content = self.content
-  local column_count = self.column_count
-  local row_count    = self.row_count
-
-  local _, _, width, height = self:bounds()
-  for index = 1, column_count*row_count do
-    if child == content[index] then
-      local cell_width  = width/column_count
-      local cell_height = height/row_count
-
-      local dx = ((index - 1)%column_count)*cell_width
-      local dy = math.floor((index - 1)/column_count)*cell_height
-      return dx, dy, cell_width, cell_height
-    end
-  end
-end
-
 GridLayout.draw          = require "lib.mljware.guilt.delegate.draw"
 GridLayout.mousepressed  = require "lib.mljware.guilt.delegate.mousepressed"
 GridLayout.mousemoved    = require "lib.mljware.guilt.delegate.mousemoved"
+GridLayout.mousedragged  = require "lib.mljware.guilt.delegate.mousedragged"
 GridLayout.mousereleased = require "lib.mljware.guilt.delegate.mousereleased"
 GridLayout.textinput     = require "lib.mljware.guilt.delegate.textinput"
 GridLayout.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
