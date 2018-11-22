@@ -1395,10 +1395,25 @@ function unicode.lower(text)
   return table.concat(result)
 end
 
+function unicode.is_digits(text)
+  for _, cc in utf8.codes(text) do
+    if not (47 < cc and cc < 58) then return false end
+  end
+  return true
+end
+
 function unicode.is_letters(text)
   local upper, lower = UPPER_TO_LOWER, LOWER_TO_UPPER
   for _, cc in utf8.codes(text) do
     if not (upper[cc] or lower[cc]) then return false end
+  end
+  return true
+end
+
+function unicode.is_alphanumeric(text)
+  local upper, lower = UPPER_TO_LOWER, LOWER_TO_UPPER
+  for _, cc in utf8.codes(text) do
+    if not ((47 < cc and cc < 58) or upper[cc] or lower[cc]) then return false end
   end
   return true
 end

@@ -123,32 +123,36 @@ function EditableText:_select_all ()
   self:_set_caret(unicode.len(self.owner.text) + 1, true)
 end
 
-function EditableText:_word_start()
+function EditableText:_token_start()
   local pos = self.caret
 
   while pos > 1
-  and unicode.is_letters(unicode.sub(self.owner.text, pos - 1, pos - 1)) do
+  and unicode.is_alphanumeric(unicode.sub(self.owner.text, pos - 1, pos - 1)) do
     pos = pos - 1
   end
 
   return pos
 end
 
-function EditableText:_word_end()
+function EditableText:_token_end()
   local text_len = unicode.len(self.owner.text)
   local pos = self.caret
 
   while pos <= text_len
-  and unicode.is_letters(unicode.sub(self.owner.text, pos, pos)) do
+  and unicode.is_alphanumeric(unicode.sub(self.owner.text, pos, pos)) do
     pos = pos + 1
   end
 
   return pos
 end
 
-function EditableText:_select_word ()
-  self.select = self:_word_start()
-  self:_set_caret(math.max(self:_word_end(), self.select + 1), true)
+function EditableText:_select_token ()
+  if self.owner.texttype == "password" then
+    self:_select_all()
+  else
+    self.select = self:_token_start()
+    self:_set_caret(math.max(self:_token_end(), self.select + 1), true)
+  end
 end
 
 function EditableText:keypressed (key)
@@ -188,9 +192,9 @@ function EditableText:keypressed (key)
   end
 
   if key == "left" then
-    self:_set_caret(math.min(ctrl_is_down and self:_word_start() or math.huge, self.caret - 1))
+    self:_set_caret(math.min(ctrl_is_down and self:_token_start() or math.huge, self.caret - 1))
   elseif key == "right" then
-    self:_set_caret(math.max(ctrl_is_down and self:_word_end() or 0, self.caret + 1))
+    self:_set_caret(math.max(ctrl_is_down and self:_token_end() or 0, self.caret + 1))
   elseif key == "home" then
     self:_set_caret(1)
   elseif key == "end" then
@@ -219,7 +223,7 @@ function EditableText:mousepressed (mx, my)
   and last_press
   and last_press + self.double_click_delay > timestamp then
     self._last_press = nil
-    self:_select_word()
+    self:_select_token()
   else
     self._last_press = timestamp
     self:_set_caret(new_caret)
