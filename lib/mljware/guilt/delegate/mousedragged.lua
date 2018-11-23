@@ -15,8 +15,8 @@ return function (self, mx, my, dx, dy, pressed1, pressed2, pressed3)
      or (pressed2 and child.pressed2)
      or (pressed3 and child.pressed3))
     and is_callable(child.mousedragged) then
-      child:mousedragged(mx, my, dx, dy, pressed1, pressed2, pressed3)
-      return true
+      local res = child:mousedragged(mx, my, dx, dy, pressed1, pressed2, pressed3)
+      return (res == nil) or res
     end
   end
 end

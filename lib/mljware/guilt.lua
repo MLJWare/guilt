@@ -121,7 +121,7 @@ local function _new(gui, template, props)
   end
   setmetatable(self, template)
   self._guilt_gui_ = gui
-  pleasure.try.invoke(self, "init")
+  pleasure.try.invoke(self, "init", gui)
   return self
 end
 
@@ -226,6 +226,7 @@ GUI.deactivate    = element_deactivate
 GUI.textinput     = require "lib.mljware.guilt.delegate.textinput"
 GUI.keypressed    = require "lib.mljware.guilt.delegate.keypressed"
 GUI.keyreleased   = require "lib.mljware.guilt.delegate.keyreleased"
+GUI.resize        = require "lib.mljware.guilt.delegate.resize"
 
 function GUI:mousepressed(mx, my, button, isTouch)
   self.active = true
